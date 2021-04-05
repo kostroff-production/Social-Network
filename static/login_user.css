@@ -1,0 +1,82 @@
+#Logon {
+    width: 420px;
+    height: 200px;
+    margin: 20% auto;
+}
+
+#Logon .form {
+    width: 400px;
+    padding: 22px 32px 20px 32px;
+    border-radius: 10px;
+    box-shadow: 0 15px 20px rgba(0,0,0,.5);
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    position: relative;
+    margin-bottom: 22px;
+}
+
+@media (max-width: 400px) {
+    #Logon {
+        width: 100%;
+    }
+
+    #Logon .form {
+        width: 100%;
+        padding: 0;
+        box-shadow: none;
+    }
+}
+
+#id_username,
+    #id_password {
+        width: 100%;
+        padding: 10px 0 2px 0;
+        border: none;
+        border-bottom: 1px solid #FFFFFF;
+        background-color: transparent;
+        outline: none;
+        transition: 0.3s;
+        font-family: sans-serif;
+        letter-spacing: 1px;
+}
+
+#Logon .form_label {
+    margin-bottom: 20px;
+    z-index: -1;
+    color: #A7A7A7;
+    transition: 0.3s;
+    font-size: 18px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+}
+
+#id_username:focus,
+    #id_password:focus {
+        border-bottom: 1px solid #1a73a8;
+}
+
+#Logon .form_button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    font-size: 12px;
+    color: #fff;
+    background-color: #0071f0;
+    outline: none;
+    cursor: pointer;
+    transition: 0.5s;
+    margin-left: 83%;
+    margin-top: 10px;
+}
+
+#Logon .form_button:focus,
+    .form_button:hover {
+    background-color: #FFFFFF;
+}
+
+.alert.alert-danger {
+    width: 400px;
+    padding: 1%;
+}

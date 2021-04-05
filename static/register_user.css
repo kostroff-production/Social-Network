@@ -1,0 +1,128 @@
+#Register {
+    width: 420px;
+    height: auto;
+    margin: 20% auto;
+}
+
+#Register .form {
+    width: 400px;
+    height: 230px;
+    padding: 22px 32px 20px 32px;
+    border-radius: 10px;
+    box-shadow: 0 15px 20px rgba(0,0,0,.5);
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    position: relative;
+    margin-bottom: 22px;
+}
+
+@media (max-width: 400px) {
+    #Register {
+        width: 100%;
+    }
+
+    #Register .form {
+        width: 100%;
+        padding: 0;
+        box-shadow: none;
+    }
+}
+
+#Register .form_input {
+    width: 100%;
+    padding: 10px 0 2px 0;
+    border: none;
+    border-bottom: 1px solid #FFFFFF;
+    background-color: transparent;
+    outline: none;
+    transition: 0.3s;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+}
+
+#Register .form_label {
+    margin-bottom: 20px;
+    z-index: -1;
+    color: #A7A7A7;
+    transition: 0.3s;
+    font-size: 18px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+}
+
+#Register .form_input:focus {
+    border-bottom: 1px solid #1a73a8;
+}
+
+#Register .form_button {
+    position: absolute;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    font-size: 12px;
+    color: #fff;
+    background-color: #0071f0;
+    outline: none;
+    cursor: pointer;
+    transition: 0.5s;
+    margin-left: 10%;
+    margin-top: 10px;
+}
+
+#Register .form_button:focus,
+    .form_button:hover {
+    background-color: #FFFFFF;
+}
+
+#Register .form_button_next {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+    font-size: 12px;
+    color: #fff;
+    background-color: #0071f0;
+    outline: none;
+    cursor: pointer;
+    transition: 0.5s;
+    margin-left: 80%;
+    margin-top: 10px;
+}
+
+#Register .form_button_next:focus,
+    .form_button_next:hover {
+    background-color: #FFFFFF;
+}
+
+#Register .form-gender {
+    width: 50%;
+    padding: 10px 0 2px 0;
+    border: none;
+    border-bottom: 1px solid #FFFFFF;
+    background-color: transparent;
+    outline: none;
+    transition: 0.3s;
+    font-family: sans-serif;
+    letter-spacing: 1px;
+}
+
+#Register .form-gender:focus,
+    #Register .form-gender:hover {
+        border-bottom: 1px solid #1a73a8;
+}
+
+#hint_base {
+    display: block;
+}
+
+#hint {
+    display: block;
+}
+
+.alert.alert-danger {
+    width: 400px;
+    padding: 1%;
+}
