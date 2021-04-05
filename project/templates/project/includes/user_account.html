@@ -1,0 +1,596 @@
+<div id="Left-position">
+    <div class="person">
+        <div class="form-avatar">
+            {% if person.album.avatar %}
+                {% for avatar in person.album.avatar %}
+                    {% if avatar.photo.photo %}
+                        <img src="/media/{{ avatar.photo.photo }}" alt="{{ person.first_name }}" class="img-thumbnail">
+                    {% else %}
+                        <img src="/static/default_avatar.jpg" alt="{{ person.first_name }}" class="img-thumbnail">
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <img src="/static/default_avatar.jpg" alt="{{ person.first_name }}" class="img-thumbnail">
+            {% endif %}
+        </div>
+    </div>
+
+    <a style="text-decoration: none;" href="{{ person.get_message_url }}"><button class="add-friend one">Написать сообщение</button></a>
+
+    <div class="status-user-box">
+        {% for friends in request.user.friends.all %}
+            {% if person == friends.friends %}
+                <p class="status-user"><i><small>Ваш друг</small></i></p>
+            {% elif person == friends.possible_friends %}
+                <p class="status-user"><i><small>Ожидает подтверждения дружбы</small></i></p>
+            {% elif person == friends.waiting_confirmations %}
+                <p class="status-user"><i><small>Запрос на дружбу отправлен</small></i></p>
+            {% endif %}
+            {% if person == friends.friends %}
+                <button class="delete-friend one" onclick="DeleteFriend(event)"
+                        data-pk-friend="{{ friends.pk }}" data-friend-user="{{ friends.friends.pk }}" data-slug="{{ request.user.slug }}">
+                        Удалить из друзей
+                </button>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <button class="add-friend one" id="bntAddFriend" onclick="SendingToAdd(event)"
+            data-user="{{ person.id }}"
+            data-slug="{{ request.user.slug }}"
+        {% for friends in request.user.friends.all %}
+            {% if person == friends.friends %}style="display: none"
+            {% elif person == friends.possible_friends %}style="display: none"
+            {% elif person == friends.waiting_confirmations %}style="display: none"
+            {% endif %}
+        {% endfor %}
+    >Добавить в друзья
+    </button>
+
+    <div class="person">
+        <div class="form">
+            <div class="quote"><i>{{ person.quote }}</i></div>
+        </div>
+    </div>
+
+    <div class="person">
+        <div class="form">
+            <label class="form_label">Статус:</label>
+            <p>{{ person.get_online_info }}</p>
+            <label class="form_label">ФИО:</label>
+            <p>{{ person.last_name }} {{ person.first_name }} {{ person.middle_name }}</p>
+            <label class="form_label">Дата рождения:</label>
+            <p>{{ person.date_birth }}</p>
+            <label class="form_label">Пол:</label>
+            <p>{{ person.gender }}</p>
+            <label class="form_label">Семейное положение:</label>
+            <p>{{ person.marital_status }}</p>
+            <label class="form_label">Телефон:</label>
+            <p>{{ person.phone }}</p>
+            <label class="form_label">Email:</label>
+            <p>{{ person.email }}</p>
+            <label class="form_label">Место жительства:</label>
+            <p>{{ person.country }}, {{ person.city }}</p>
+        </div>
+    </div>
+
+<div id="backgroundDivRePost" style="display: none">
+</div>
+<div class="Re-Post" style="display: none">
+    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-x-square-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm9.854 4.854a.5.5 0 0 0-.708-.708L8 7.293 4.854 4.146a.5.5 0 1 0-.708.708L7.293 8l-3.147 3.146a.5.5 0 0 0 .708.708L8 8.707l3.146 3.147a.5.5 0 0 0 .708-.708L8.707 8l3.147-3.146z"/>
+    </svg>
+    <div class="Re-Post-Form">
+        <label class="label">Поделиться контентом</label>
+        <div class="Re-Post-Wall">
+            <label class="checkbox">
+                <input class="checkbox-re-post" type="checkbox" value="1">
+                <div class="checkbox__text">на моей стене</div>
+            </label>
+        </div>
+        <div class="Re-Post-Message">
+            <label class="checkbox">
+                <input class="checkbox-re-post" type="checkbox" value="2">
+                <div class="checkbox__text">в сообщении</div>
+            </label>
+            <div class="Re-Post-Friends">
+                <div class="Search-Friends" style="display: none">
+                    <div class="Search-input" data-object_id="{{ request.user.id }}" contenteditable="true" data-placeholder="Введите ФИО друга...."></div>
+                    <svg onclick="toggleListFriends()" width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-file-arrow-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M12 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                    </svg>
+                </div>
+                <div class="check-user" style="display: none">
+                </div>
+                <div class="Result-Friends" style="display: none">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends %}
+                            <p data-id="user-{{ friend.friends.id }}" onclick="transferID(event)">{{ friend.friends.first_name }} {{ friend.friends.last_name }}</p>
+                        {% endif %}
+                    {% endfor %}
+                    {% for chat in chats %}
+                        <p data-id="chat-{{ chat.id }}" onclick="transferID(event)">{% for members in chat.members.all %}{% if members != request.user %} {{ members }} {% endif %}{% endfor %}</p>
+                    {% endfor %}
+                </div>
+                <div class="Result-Search" style="display: none">
+
+                </div>
+            </div>
+        </div>
+        <div class="Message-box">
+            <div class="Message" id="message-re-post" contenteditable="true" data-placeholder="Ваше сообщение...."></div>
+            <div class="emoji-box-base">
+                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-emoji-smile" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path fill-rule="evenodd" d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683z"/>
+                  <path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+                </svg>
+            </div>
+        </div>
+        <button class="button-re-post" data-slug="{{ request.user.slug }}">Отправить</button>
+    </div>
+    <div id="block-emoji" class="block-emoji">
+        {% include 'project/includes/emoji.html' %}
+    </div>
+</div>
+
+{% if permissions.count == 0 %}
+
+    <div class="person">
+        <div class="form-sub">
+            <a href="{{ person.get_photos_url }}">
+                <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-camera-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                  <path fill-rule="evenodd" d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                </svg>
+            </a>
+            <p class="sub-count">{{ person.photo.all.count }}</p>
+        </div>
+    </div>
+
+    <div class="person">
+        <div class="form-sub">
+            <a href="{{ person.get_audios_url }}">
+                <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-music-note-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z"/>
+                  <path fill-rule="evenodd" d="M12 3v10h-1V3h1z"/>
+                  <path d="M11 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 16 2.22V4l-5 1V2.82z"/>
+                  <path fill-rule="evenodd" d="M0 11.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 7H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 3H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+            </a>
+            <p class="sub-count">{{ person.audio.all.count }}</p>
+        </div>
+    </div>
+
+    <div class="person">
+        <div class="form-sub">
+            <a href="{{ person.get_videos_url }}">
+                <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-camera-reels-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2.667 6h6.666C10.253 6 11 6.746 11 7.667v6.666c0 .92-.746 1.667-1.667 1.667H2.667C1.747 16 1 15.254 1 14.333V7.667C1 6.747 1.746 6 2.667 6z"/>
+                  <path d="M7.404 11.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V7.308c0-.63-.693-1.01-1.233-.696l-6.363 3.692a.802.802 0 0 0 0 1.393z"/>
+                  <circle cx="3" cy="3" r="3"/>
+                  <circle cx="9" cy="3" r="3"/>
+                </svg>
+            </a>
+            <p class="sub-count">{{ person.video.all.count }}</p>
+        </div>
+    </div>
+
+    <div class="person">
+        <div class="form-sub">
+            <a href="{{ person.get_group_url }}">
+                <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-layers-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/>
+                  <path fill-rule="evenodd" d="M2.125 8.567l-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l.418-.785-.419.785-5.169-2.756z"/>
+                </svg>
+            </a>
+            <p class="sub-count"></p>
+        </div>
+    </div>
+
+    <div class="person">
+        <div class="form-sub">
+            <a href="{{ person.get_friends_url }}">
+                <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-people-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                </svg>
+            </a>
+            <p class="sub-count">{{ count_friends }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="scrollTop-btn" style="display: none">
+    <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-chevron-double-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708l6-6z"/>
+      <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+    </svg>
+</div>
+
+<div id="Posts">
+    {% for post in person.posts.all %}
+        <div class="post" id="post-{{ post.pk }}" data-author-post="/person/{{ post.user.slug }}/" data-author-username="{{ post.user.first_name }} {{ post.user.last_name }}" data-re-post-pk="{% for obj in post.re_posts.all %}{{ obj.pk }}{% endfor %}">
+            <p class="post_date"><i>{{ post.date_pub }}</i></p>
+            <p class="post_message">{{ post.message|safe }}</p>
+            <div class="bi-base">
+                <div class="btn-bi" data-slug="{{ post.slug }}" data-id="{{ post.id }}" data-obj="person" data-type="Post" data-action="Like" title="Нравится">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                        {% for user in post.votes.all %}
+                            {% if request.user == user.user %}
+                                style="display: none"
+                            {% endif %}
+                        {% endfor %}
+                    >
+                      <path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                    </svg>
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                        {% for user in post.votes.all %}
+                            {% if request.user == user.user %}
+                                style="display: inline-block"
+                            {% endif %}
+                        {% endfor %}
+                         style="display: none"
+                    >
+                      <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                    </svg>
+                    <div class="bi-count" data-count="Like">{{ post.votes.likes.count }}</div>
+                </div>
+                <a class="btn-bi" href="{{ post.get_absolute_url }}" target="_blank">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-chat-left-text" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v11.586l2-2A2 2 0 0 1 4.414 11H14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                      <path fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                    <div class="bi-count">{{ post.comments.all.count }}</div>
+                </a>
+                <div class="btn-bi re-post-post" onclick="Router(event)">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+                      <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                    </svg>
+                    <div class="bi-count" data-count="RePosts">
+                        {% for obj in post.re_posts.all %}
+                            {{ obj.recipients.all.count }}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% else %}
+    {% for permission in permissions %}
+        {% if permission.all.all.count == 0 %}
+
+            {% if permission.photo.all.count == 0 and request.user not in permission.photoHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_photos_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-camera-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                              <path fill-rule="evenodd" d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ person.photo.all.count }}</p>
+                    </div>
+                </div>
+            {% elif request.user in permission.photo.all and request.user not in permission.photoHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_photos_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-camera-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                              <path fill-rule="evenodd" d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ person.photo.all.count }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a>
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-camera-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                              <path fill-rule="evenodd" d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">Доступ ограничен</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if permission.audio.all.count == 0 and request.user not in permission.audioHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_audios_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-music-note-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z"/>
+                              <path fill-rule="evenodd" d="M12 3v10h-1V3h1z"/>
+                              <path d="M11 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 16 2.22V4l-5 1V2.82z"/>
+                              <path fill-rule="evenodd" d="M0 11.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 7H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 3H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ person.audio.all.count }}</p>
+                    </div>
+                </div>
+            {% elif request.user in permission.audio.all and request.user not in permission.audioHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_audios_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-music-note-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z"/>
+                              <path fill-rule="evenodd" d="M12 3v10h-1V3h1z"/>
+                              <path d="M11 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 16 2.22V4l-5 1V2.82z"/>
+                              <path fill-rule="evenodd" d="M0 11.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 7H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 3H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ person.audio.all.count }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a>
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-music-note-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z"/>
+                              <path fill-rule="evenodd" d="M12 3v10h-1V3h1z"/>
+                              <path d="M11 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 16 2.22V4l-5 1V2.82z"/>
+                              <path fill-rule="evenodd" d="M0 11.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 7H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 3H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">Доступ ограничен</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if permission.video.all.count == 0 and request.user not in permission.videoHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_videos_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-camera-reels-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M2.667 6h6.666C10.253 6 11 6.746 11 7.667v6.666c0 .92-.746 1.667-1.667 1.667H2.667C1.747 16 1 15.254 1 14.333V7.667C1 6.747 1.746 6 2.667 6z"/>
+                              <path d="M7.404 11.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V7.308c0-.63-.693-1.01-1.233-.696l-6.363 3.692a.802.802 0 0 0 0 1.393z"/>
+                              <circle cx="3" cy="3" r="3"/>
+                              <circle cx="9" cy="3" r="3"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ person.video.all.count }}</p>
+                    </div>
+                </div>
+            {% elif request.user in permission.video.all and request.user not in permission.videoHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_videos_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-camera-reels-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M2.667 6h6.666C10.253 6 11 6.746 11 7.667v6.666c0 .92-.746 1.667-1.667 1.667H2.667C1.747 16 1 15.254 1 14.333V7.667C1 6.747 1.746 6 2.667 6z"/>
+                              <path d="M7.404 11.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V7.308c0-.63-.693-1.01-1.233-.696l-6.363 3.692a.802.802 0 0 0 0 1.393z"/>
+                              <circle cx="3" cy="3" r="3"/>
+                              <circle cx="9" cy="3" r="3"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ person.video.all.count }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a>
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-camera-reels-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M2.667 6h6.666C10.253 6 11 6.746 11 7.667v6.666c0 .92-.746 1.667-1.667 1.667H2.667C1.747 16 1 15.254 1 14.333V7.667C1 6.747 1.746 6 2.667 6z"/>
+                              <path d="M7.404 11.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V7.308c0-.63-.693-1.01-1.233-.696l-6.363 3.692a.802.802 0 0 0 0 1.393z"/>
+                              <circle cx="3" cy="3" r="3"/>
+                              <circle cx="9" cy="3" r="3"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">Доступ ограничен</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if permission.group.all.count == 0 and request.user not in permission.groupHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_group_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-layers-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/>
+                              <path fill-rule="evenodd" d="M2.125 8.567l-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l.418-.785-.419.785-5.169-2.756z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ followGroups.count }}</p>
+                    </div>
+                </div>
+            {% elif request.user in permission.group.all and request.user not in permission.groupHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_group_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-layers-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/>
+                              <path fill-rule="evenodd" d="M2.125 8.567l-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l.418-.785-.419.785-5.169-2.756z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ followGroups.count }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a>
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-layers-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4z"/>
+                              <path fill-rule="evenodd" d="M2.125 8.567l-1.86.992a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882l-1.86-.992-5.17 2.756a1.5 1.5 0 0 1-1.41 0l.418-.785-.419.785-5.169-2.756z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">Доступ ограничен</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if permission.friend.all.count == 0 and request.user not in permission.friendHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_friends_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-people-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ count_friends }}</p>
+                    </div>
+                </div>
+            {% elif request.user in permission.friend.all and request.user not in permission.friendHidFriend.all %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a href="{{ person.get_friends_url }}">
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-people-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">{{ count_friends }}</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="person">
+                    <div class="form-sub">
+                        <a>
+                            <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-people-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                            </svg>
+                        </a>
+                        <p class="sub-count">Доступ ограничен</p>
+                    </div>
+                </div>
+            {% endif %}
+            </div>
+
+            <div class="scrollTop-btn" style="display: none">
+                <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-chevron-double-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708l6-6z"/>
+                  <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+                </svg>
+            </div>
+
+            {% if permission.post.all.count == 0 and request.user not in permission.postHidFriend.all %}
+                <div id="Posts">
+                    {% for post in person.posts.all %}
+                        <div class="post" data-obj="Post" id="post-{{ post.pk }}" data-author-post="/person/{{ post.user.slug }}/" data-author-username="{{ post.user.first_name }} {{ post.user.last_name }}" data-re-post-pk="{% for obj in post.re_posts.all %}{{ obj.pk }}{% endfor %}">
+                            <p class="post_date"><i>{{ post.date_pub }}</i></p>
+                            <p class="post_message">{{ post.message|safe }}</p>
+                            <div class="bi-base">
+                                <div class="btn-bi" data-slug="{{ post.slug }}" data-id="{{ post.id }}" data-obj="person" data-type="Post" data-action="Like" title="Нравится">
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                                        {% for user in post.votes.all %}
+                                            {% if request.user == user.user %}
+                                                style="display: none"
+                                            {% endif %}
+                                        {% endfor %}
+                                    >
+                                      <path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                                    </svg>
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                                        {% for user in post.votes.all %}
+                                            {% if request.user == user.user %}
+                                                style="display: inline-block"
+                                            {% endif %}
+                                        {% endfor %}
+                                         style="display: none"
+                                    >
+                                      <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                                    </svg>
+                                    <div class="bi-count" data-count="Like">{{ post.votes.likes.count }}</div>
+                                </div>
+                                <a class="btn-bi" href="{{ post.get_absolute_url }}" style="text-decoration: none; color: #666666;" target="_blank">
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-chat-left-text" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                      <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v11.586l2-2A2 2 0 0 1 4.414 11H14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                      <path fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                                    </svg>
+                                    <div class="bi-count">{{ post.comments.all.count }}</div>
+                                </a>
+                                <div class="btn-bi re-post-post" onclick="Router(event)">
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                      <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+                                      <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                                    </svg>
+                                    <div class="bi-count" data-count="RePosts">
+                                        {% for obj in post.re_posts.all %}
+                                            {{ obj.recipients.all.count }}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% elif request.user in permission.post.all and request.user not in permission.postHidFriend.all %}
+                <div id="Posts">
+                    {% for post in person.posts.all %}
+                        <div class="post" data-obj="Post" id="post-{{ post.pk }}" data-author-post="/person/{{ post.user.slug }}/" data-author-username="{{ post.user.first_name }} {{ post.user.last_name }}" data-re-post-pk="{% for obj in post.re_posts.all %}{{ obj.pk }}{% endfor %}">
+                            <p class="post_date"><i>{{ post.date_pub }}</i></p>
+                            <p class="post_message">{{ post.message|safe }}</p>
+                            <div class="bi-base">
+                                <div class="btn-bi" data-slug="{{ post.slug }}" data-id="{{ post.id }}" data-obj="person" data-type="Post" data-action="Like" title="Нравится">
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                                        {% for user in post.votes.all %}
+                                            {% if request.user == user.user %}
+                                                style="display: none"
+                                            {% endif %}
+                                        {% endfor %}
+                                    >
+                                      <path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                                    </svg>
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                                        {% for user in post.votes.all %}
+                                            {% if request.user == user.user %}
+                                                style="display: inline-block"
+                                            {% endif %}
+                                        {% endfor %}
+                                         style="display: none"
+                                    >
+                                      <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                                    </svg>
+                                    <div class="bi-count" data-count="Like">{{ post.votes.likes.count }}</div>
+                                </div>
+                                <a class="btn-bi" href="{{ post.get_absolute_url }}" style="text-decoration: none; color: #666666;" target="_blank">
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-chat-left-text" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                      <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v11.586l2-2A2 2 0 0 1 4.414 11H14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                                      <path fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                                    </svg>
+                                    <div class="bi-count">{{ post.comments.all.count }}</div>
+                                </a>
+                                <div class="btn-bi re-post-post" onclick="Router(event)">
+                                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                      <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+                                      <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                                    </svg>
+                                    <div class="bi-count" data-count="RePosts">
+                                        {% for obj in post.re_posts.all %}
+                                            {{ obj.recipients.all.count }}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div id="Posts">
+                    <div class="post">
+                        <h3>Доступ к просмотру постов ограничен</h3>
+                    </div>
+                </div>
+            {% endif %}
+
+        {% else %}
+            </div>
+            <div id="Posts">
+                <div class="post">
+                    <p class="text-lock">
+                        <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-lock" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M11.5 8h-7a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1zm-7-1a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-7zm0-3a3.5 3.5 0 1 1 7 0v3h-1V4a2.5 2.5 0 0 0-5 0v3h-1V4z"/>
+                        </svg>
+                    </p>
+                    <h3>Закрытый профиль</h3>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endif %}

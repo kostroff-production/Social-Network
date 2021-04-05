@@ -1,0 +1,370 @@
+<div id="backgroundDivRePost" style="display: none">
+</div>
+<div class="Re-Post" style="display: none">
+    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-x-square-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm9.854 4.854a.5.5 0 0 0-.708-.708L8 7.293 4.854 4.146a.5.5 0 1 0-.708.708L7.293 8l-3.147 3.146a.5.5 0 0 0 .708.708L8 8.707l3.146 3.147a.5.5 0 0 0 .708-.708L8.707 8l3.147-3.146z"/>
+    </svg>
+    <div class="Re-Post-Form">
+        <label class="label">Поделиться контентом</label>
+        <div class="Re-Post-Wall">
+            <label class="checkbox">
+                <input class="checkbox-re-post" type="checkbox" value="1">
+                <div class="checkbox__text">на моей стене</div>
+            </label>
+        </div>
+        <div class="Re-Post-Message">
+            <label class="checkbox">
+                <input class="checkbox-re-post" type="checkbox" value="2">
+                <div class="checkbox__text">в сообщении</div>
+            </label>
+            <div class="Re-Post-Friends">
+                <div class="Search-Friends" style="display: none">
+                    <div class="Search-input" data-object_id="{{ request.user.id }}" contenteditable="true" data-placeholder="Введите ФИО друга...."></div>
+                    <svg onclick="toggleListFriends()" width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-file-arrow-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M12 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                    </svg>
+                </div>
+                <div class="check-user" style="display: none">
+                </div>
+                <div class="Result-Friends" style="display: none">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends %}
+                            <p data-id="user-{{ friend.friends.id }}" onclick="transferID(event)">{{ friend.friends.first_name }} {{ friend.friends.last_name }}</p>
+                        {% endif %}
+                    {% endfor %}
+                    {% for chat in chats %}
+                        <p data-id="chat-{{ chat.id }}" onclick="transferID(event)">{% for members in chat.members.all %}{% if members != request.user %} {{ members }} {% endif %}{% endfor %}</p>
+                    {% endfor %}
+                </div>
+                <div class="Result-Search" style="display: none">
+
+                </div>
+            </div>
+        </div>
+        <div class="Message-box">
+            <div class="Message" id="message-re-post" contenteditable="true" data-placeholder="Ваше сообщение...."></div>
+            <div class="emoji-box-base">
+                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-emoji-smile" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path fill-rule="evenodd" d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683z"/>
+                  <path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+                </svg>
+            </div>
+        </div>
+        <button class="button-re-post" data-slug="{{ request.user.slug }}">Отправить</button>
+    </div>
+    <div id="block-emoji" class="block-emoji">
+        {% include 'project/includes/emoji.html' %}
+    </div>
+</div>
+
+<div class="search list-group">
+    <input type="search" class="search-input" data-user="{{ person.id }}" placeholder="Поиск среди подписанных....">
+    <svg onclick="searchResult()" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+      <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+    </svg>
+</div>
+<div id="CreateGroup" title="Создать группу" onclick="showFormGroup()">
+    <svg width="2.5em" height="2.5em" viewBox="0 0 16 16" class="bi bi-layers-half" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M3.188 8L.264 9.559a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882L12.813 8l-4.578 2.441a.5.5 0 0 1-.47 0L3.188 8z"/>
+      <path fill-rule="evenodd" d="M7.765 1.559a.5.5 0 0 1 .47 0l7.5 4a.5.5 0 0 1 0 .882l-7.5 4a.5.5 0 0 1-.47 0l-7.5-4a.5.5 0 0 1 0-.882l7.5-4zM1.563 6L8 9.433 14.438 6 8 2.567 1.562 6z"/>
+    </svg>
+</div>
+<div id="FormGroup">
+    <svg onclick="cancelFormGroup()" width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+    </svg>
+    <label class="label">Создание группы</label>
+    <form action="{% url 'group_create_url' %}" method="post">
+        {% csrf_token %}
+        {{ formGroup }}
+        <div onkeyup="copyText()" id="descriptionGroup" contenteditable="true" data-placeholder="Придумайте описание...."></div>
+        <button class="button-create-group">Создать</button>
+    </form>
+</div>
+
+<div id="tabs">
+    <ul class="tabs__list">
+        <li class="tabs__item select" data-id="tabs-1">Подписки</li>
+        <li class="tabs__item" data-id="tabs-2">Список групп</li>
+        <li class="tabs__item" data-id="tabs-3">Мои группы</li>
+    </ul>
+    <div class="tabs__text" id="tabs-search">
+
+    </div>
+    <div class="tabs__text select" id="tabs-1">
+        {% for group in followGroups %}
+            <div class="group">
+                <div class="group-body avatar">
+                    {% if group.album.avatar %}
+                        {% for avatar in group.album.avatar %}
+                            {% if avatar.photo.photo %}
+                                <a href="{{ group.get_absolute_url }}"><img src="/media/{{ avatar.photo.photo }}" alt="" class="img-avatar"></a>
+                            {% else %}
+                                <a href="{{ group.get_absolute_url }}"><img src="/static/defaultGroup.png" alt="" class="img-avatar"></a>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <a href="{{ group.get_absolute_url }}"><img src="/static/defaultGroup.png" alt="" class="img-avatar"></a>
+                    {% endif %}
+                </div>
+                <div class="group-body title">
+                    <p class="group-name"><a href="{{ group.get_absolute_url }}">{{ group.name }}</a></p>
+                    <p class="group-quote">{{ group.quote }}</p>
+                    <p class="group-followers">Подписчиков: {{ group.followers.all.count }}</p>
+                </div>
+                <div class="group-body menu" onclick="showMenu(event)">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                    </svg>
+                </div>
+                <div class="drop-menu">
+                    {% if request.user not in group.followers.all %}
+                        <div class="body-drop subscribe" onclick="pushSubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="createFollowers(event)">
+                                <p>Подписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-check2-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="body-drop unsubscribe" style="display: none" onclick="pushUnsubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="removeFollowers(event)">
+                                <p>Отписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-backspace" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
+                                  <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
+                                  <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    {% elif request.user in group.followers.all %}
+                        <div class="body-drop unsubscribe" onclick="pushUnsubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="removeFollowers(event)">
+                                <p>Отписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-backspace" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
+                                  <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
+                                  <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="body-drop subscribe" style="display: none" onclick="pushSubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="createFollowers(event)">
+                                <p>Подписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-check2-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="body-drop re_post" data-id="group-{{ group.id }}" onclick="Router(event)">
+                        <div class="text">
+                            <p>Поделиться</p>
+                        </div>
+                        <div class="tag">
+                            <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+                              <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="tabs__text" id="tabs-2">
+        {% for group in allGroups %}
+            <div class="group" id="group-{{ group.pk }}">
+                <div class="group-body avatar">
+                    {% if group.album.avatar %}
+                        {% for avatar in group.album.avatar %}
+                            {% if avatar.photo.photo %}
+                                <a href="{{ group.get_absolute_url }}"><img src="/media/{{ avatar.photo.photo }}" alt="" class="img-avatar"></a>
+                            {% else %}
+                                <a href="{{ group.get_absolute_url }}"><img src="/static/defaultGroup.png" alt="" class="img-avatar"></a>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <a href="{{ group.get_absolute_url }}"><img src="/static/defaultGroup.png" alt="" class="img-avatar"></a>
+                    {% endif %}
+                </div>
+                <div class="group-body title">
+                    <p class="group-name"><a href="{{ group.get_absolute_url }}">{{ group.name }}</a></p>
+                    <p class="group-quote">{{ group.quote }}</p>
+                    <p class="group-followers">Подписчиков: {{ group.followers.all.count }}</p>
+                </div>
+                <div class="group-body menu" onclick="showMenu(event)">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                    </svg>
+                </div>
+                <div class="drop-menu">
+                    {% if request.user not in group.followers.all %}
+                        <div class="body-drop subscribe" onclick="pushSubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="createFollowers(event)">
+                                <p>Подписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-check2-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="body-drop unsubscribe" style="display: none" onclick="pushUnsubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="removeFollowers(event)">
+                                <p>Отписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-backspace" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
+                                  <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
+                                  <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    {% elif request.user in group.followers.all %}
+                        <div class="body-drop unsubscribe" onclick="pushUnsubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="removeFollowers(event)">
+                                <p>Отписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-backspace" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
+                                  <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
+                                  <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="body-drop subscribe" style="display: none" onclick="pushSubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="createFollowers(event)">
+                                <p>Подписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-check2-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="body-drop re_post" data-id="group-{{ group.id }}" onclick="Router(event)">
+                        <div class="text">
+                            <p>Поделиться</p>
+                        </div>
+                        <div class="tag">
+                            <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+                              <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="tabs__text" id="tabs-3">
+        {% for group in personGroups %}
+            <div class="group">
+                <div class="group-body avatar">
+                    {% if group.album.avatar %}
+                        {% for avatar in group.album.avatar %}
+                            {% if avatar.photo.photo %}
+                                <a href="{{ group.get_absolute_url }}"><img src="/media/{{ avatar.photo.photo }}" alt="" class="img-avatar"></a>
+                            {% else %}
+                                <a href="{{ group.get_absolute_url }}"><img src="/static/defaultGroup.png" alt="" class="img-avatar"></a>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <a href="{{ group.get_absolute_url }}"><img src="/static/defaultGroup.png" alt="" class="img-avatar"></a>
+                    {% endif %}
+                </div>
+                <div class="group-body title">
+                    <p class="group-name"><a href="{{ group.get_absolute_url }}">{{ group.name }}</a></p>
+                    <p class="group-quote">{{ group.quote }}</p>
+                    <p class="group-followers">Подписчиков: {{ group.followers.all.count }}</p>
+                </div>
+                <div class="group-body menu" onclick="showMenu(event)">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                    </svg>
+                </div>
+                <div class="drop-menu">
+                    {% if request.user not in group.followers.all %}
+                        <div class="body-drop subscribe" onclick="pushSubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="createFollowers(event)">
+                                <p>Подписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-check2-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="body-drop unsubscribe" style="display: none" onclick="pushUnsubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="removeFollowers(event)">
+                                <p>Отписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-backspace" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
+                                  <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
+                                  <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    {% elif request.user in group.followers.all %}
+                        <div class="body-drop unsubscribe" onclick="pushUnsubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="removeFollowers(event)">
+                                <p>Отписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-backspace" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
+                                  <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
+                                  <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="body-drop subscribe" style="display: none" onclick="pushSubscribe(event)">
+                            <div class="text" data-pk="{{ group.pk }}" onclick="createFollowers(event)">
+                                <p>Подписаться</p>
+                            </div>
+                            <div class="tag">
+                                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-check2-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="body-drop re_post" data-id="group-{{ group.id }}" onclick="Router(event)">
+                        <div class="text">
+                            <p>Поделиться</p>
+                        </div>
+                        <div class="tag">
+                            <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+                              <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>

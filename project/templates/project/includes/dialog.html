@@ -1,0 +1,171 @@
+{% load tz %}
+<p data-chat-id="{{ chat.id }}"></p>
+{% for message_item in chat.message_set.all %}
+    {% with message_id=message_item.id %}
+        {% if message_item.author != request.user %}
+            <div class="message-box-friend">
+                <a href="{{ message_item.author.get_absolute_url }}">
+                    {% if message_item.author.album.avatar %}
+                        {% for avatar in message_item.author.album.avatar %}
+                            {% if avatar.photo.photo %}
+                                <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-circle avatar-message">
+                            {% else %}
+                                <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-message">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <img src="/static/default_avatar.jpg" alt="{{ message_item.author.first_name }}" class="img-circle avatar-message">
+                    {% endif %}
+                </a>
+                <div class="message-body">
+                    <ul class="list-inline">
+                        <li class="drop-left-padding">
+                            <strong class="message-author"><a href="{{ message_item.author.get_absolute_url }}">{{ message_item.author.first_name }}</a></strong>
+                        </li>
+                        <li class="pull-right text-muted"><small class="message-date-pub">{{ message_item.date_pub|utc }}</small></li>
+                    </ul>
+                    <div data-message-id="{{ message_id }}" data-message-slug="{{ message_item.slug_message }}" data-chat-id="{{ chat.id }}" class="item-message-id">
+                        <p id="{{ message_id }}"
+                            style="
+                                {% if not message_item.is_read %}
+                                 color: #FD9292;
+                                {% endif %}">
+                            {{ message_item.message|safe }}
+                        </p>
+                        {% if message_item.is_update == True %}
+                            <small class="pull-right update-message-status">(редактировано {{ message_item.date_update }})</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% elif message_item.author == request.user %}
+            <div class="message-box-user" data-message-id="{{ message_id }}" data-message-slug="{{ message_item.slug_message }}" data-chat-id="{{ chat.id }}">
+                <div class="message-menu">
+                     <li class="message-menu">
+                         <div class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                             <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                            </svg>
+                         </div>
+                        <ul class="dropdown-menu message">
+                            <li>
+                                <div class="edit-message">
+                                    <p>Редактировать</p>
+                                    <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                                    </svg>
+                                </div>
+                                <div class="btn-delete-message">
+                                    <p>Удалить</p>
+                                    <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                      <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                    </svg>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                </div>
+                <div class="message-body-user">
+                    <ul class="list-inline message">
+                        <li class="pull-right text-muted"><small class="message-date-pub-user">{{ message_item.date_pub|utc }}</small></li>
+                    </ul>
+                    <div class="item-message-id user">
+                        <p id="{{ message_id }}"
+                            style="
+                                {% if not message_item.is_read %}
+                                 color: #FD9292;
+                                {% endif %}">
+                            {{ message_item.message|safe }}
+                        </p>
+                        {% if message_item.is_update == True %}
+                            <small class="update-message-status">(редактировано {{ message_item.date_update }})</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <a href="{{ message_item.author.get_absolute_url }}" class="avatar-message-base">
+                    {% if message_item.author.album.avatar %}
+                        {% for avatar in message_item.author.album.avatar %}
+                            {% if avatar.photo.photo %}
+                                <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-circle avatar-message">
+                            {% else %}
+                                <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-message">
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <img src="/static/default_avatar.jpg" alt="{{ message_item.author.first_name }}" class="img-circle avatar-message">
+                    {% endif %}
+                </a>
+            </div>
+        {% endif %}
+    {% endwith %}
+{% endfor %}
+
+<div class="message-box-user" id="message-box-user" style="display: none" data-user="{{ request.user.id }}" data-chat-id="{{ chat.id }}">
+    <div class="message-menu">
+         <li class="message-menu">
+             <div class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                 <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                </svg>
+             </div>
+            <ul class="dropdown-menu message">
+                <li>
+                    <div class="edit-message">
+                        <p>Редактировать</p>
+                        <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-pencil-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456l-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+                        </svg>
+                    </div>
+                    <div class="btn-delete-message">
+                        <p>Удалить</p>
+                        <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-trash" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                          <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                        </svg>
+                    </div>
+                </li>
+            </ul>
+        </li>
+    </div>
+    <div class="message-body-user">
+        <ul class="list-inline message">
+            <li class="pull-right text-muted"><small class="message-date-pub-user"></small></li>
+        </ul>
+        <div class="create-item-message-id">
+            <p id="" style="color: #FD9292;"></p>
+        </div>
+    </div>
+    <a href="{{ request.user.get_absolute_url }}" class="avatar-message-base">
+        {% if request.user.album.avatar %}
+            {% for avatar in request.user.album.avatar %}
+                {% if avatar.photo.photo %}
+                    <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-circle avatar-message">
+                {% else %}
+                    <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-message">
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-message">
+        {% endif %}
+    </a>
+</div>
+
+<div class="message-box-friend" id="message-box-friend" style="display: none">
+    <a href="">
+        <img src="" alt="" class="img-circle avatar-message">
+    </a>
+    <div class="message-body">
+        <ul class="list-inline">
+            <li class="drop-left-padding">
+                <strong class="message-author"><a href=""></a></strong>
+            </li>
+            <li class="pull-right text-muted"><small class="message-date-pub"></small></li>
+        </ul>
+        <div data-chat-id="{{ chat.id }}" class="item-message-id">
+            <p id=""></p>
+        </div>
+    </div>
+</div>

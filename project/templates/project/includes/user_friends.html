@@ -1,0 +1,64 @@
+<a class="btn-back" href="{{ person.get_absolute_url }}" title="Назад">
+    <svg width="2.5em" height="2.5em" viewBox="0 0 16 16" class="bi bi-arrow-left-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+      <path fill-rule="evenodd" d="M8.354 11.354a.5.5 0 0 0 0-.708L5.707 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"/>
+      <path fill-rule="evenodd" d="M11.5 8a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"/>
+    </svg>
+</a>
+
+<div class="search">
+    <input type="search" class="search-input" data-id="{{ person.id }}" placeholder="Поиск среди друзей....">
+    <svg onclick="searchResult()" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+      <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+    </svg>
+</div>
+<div id="tabs">
+    <ul class="tabs__list">
+        <li class="tabs__item user select" data-id="tabs-1">Друзья пользователя - {{ person.first_name }} {{ person.last_name }}</li>
+    </ul>
+    <div class="tabs__text" id="tabs-search">
+
+    </div>
+
+    <div class="tabs__text select" id="tabs-1">
+        {% if person.friends.all.count == 0 %}
+            <h3>У пользователя {{ person.first_name }} пока нет друзей</h3>
+        {% endif %}
+        {% for friend in person.friends.all %}
+            {% if friend.friends %}
+                <div class="FriendBox" id="friend-{{ friend.friends.id }}">
+                    <a href="{{ friend.friends.get_absolute_url }}">
+                        <div class="friend-link">
+                            {% if friend.friends.album.avatar %}
+                                {% for avatar in friend.friends.album.avatar %}
+                                    {% if avatar.photo.photo %}
+                                        <img src="/media/{{ avatar.photo.photo }}" alt="{{ person.first_name }}" class="img-circle">
+                                    {% else %}
+                                        <img src="/static/default_avatar.jpg" alt="{{ person.first_name }}" class="img-circle">
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <img src="/static/default_avatar.jpg" alt="{{ person.first_name }}" class="img-circle">
+                            {% endif %}
+                            <div class="data-friend">
+                                <p>{{ friend.friends.first_name }} {{ friend.friends.last_name }}</p>
+                                <p>{{ friend.friends.marital_status }}</p>
+                                <p>{{ friend.friends.date_birth|timesince }}</p>
+                            </div>
+                        </div>
+                    </a>
+                    {% for user in request.user.friends.all %}
+                        {% if friend.friends == user.friends %}
+                            <p><i><small>Ваш друг</small></i></p>
+                        {% elif friend.friends == user.possible_friends %}
+                            <p><i><small>Ожидает подтверждения дружбы</small></i></p>
+                        {% elif friend.friends == user.waiting_confirmations %}
+                            <p><i><small>Запрос на дружбу отправлен</small></i></p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
