@@ -79,9 +79,9 @@ LOGGING = {
 SECRET_KEY = '%4dyz@lhes*^r0%_%#2_oq1wk2xz=lu0wen623p%8qlv*kzq2='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -154,9 +154,9 @@ ADMINS = [
 DATABASES = { # прописываем от куда подключать БД
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'Social_Network',
+        'NAME': 'Social-Network',
         'USER': 'Jony',
-        'PASSWORD': 'jony8889',
+        'PASSWORD': 'Jony8889',
         'HOST': 'localhost',
         'PORT': '5432',
     }
