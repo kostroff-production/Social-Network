@@ -1180,7 +1180,7 @@ class ObjectBackColorMixin:
         src = request.POST.get('src') # получаем адрес хранения медиа файла в нашем каталоге проекта
 
         # но этого не достаточно, так как данный алгоритм не знает, что он в проекте ему нужно указать полный адрес нахождения файла начиная с корневого каталога
-        img = r'C:\Users\Jony\Desktop\Social Network\social_network' + src
+        img = '/webapps/Social-Network-project/' + src
 
         # создаем наследуем класс кортежа, с именованными полями, благодаря подлючаемому модулю namedtuple
         Point = namedtuple('Point', ('coords', 'n', 'ct'))  # один с координатами точек разбросанных по обложке альбома
