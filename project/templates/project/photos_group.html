@@ -1,0 +1,15 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+{% block content %}
+
+<link href="{% static 'photos.css' %}" rel="stylesheet">
+
+    {% if request.user == person.user %}
+        {% include 'project/includes/personal_photos.html' %}
+    {% else %}
+        {% include 'project/includes/user_photos_group.html' %}
+    {% endif %}
+
+<script src="{% static 'Photos.js' %}"></script>
+{% endblock %}

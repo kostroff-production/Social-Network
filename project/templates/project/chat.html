@@ -1,0 +1,230 @@
+{% extends 'nav_bar.html' %}
+{% load tz %}
+{% load static %}
+
+{% block title %}
+	{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<link href="{% static 'chats.css' %}" rel="stylesheet">
+        <div class="search">
+            <input type="search" id="SearchInput" data-user="{{ request.user.id }}" class="search-input" placeholder="Поиск собеседника....">
+            <svg onclick="searchResult()" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+              <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+            </svg>
+        </div>
+        <div id="CreateChat" data-title="Создать чат">
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-people-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+            </svg>
+        </div>
+        <div id="CancelChat" data-title="Отменить">
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-dash-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm5-.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/>
+            </svg>
+        </div>
+        <div id="SaveChat" data-title="Начать беседу">
+            <svg onclick="SaveChat(event)" width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-person-check-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm9.854-2.854a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L12.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+            </svg>
+        </div>
+        <div id="resultSearch">
+            <div>
+                <p class="txtSearch">Результаты поиска</p>
+                <svg onclick="cancelSearch()" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                  <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                </svg>
+            </div>
+            <div id="scrollSearchResult">
+
+            </div>
+        </div>
+        <div class="tabs">
+          <div class="tab-2">
+            <label class="tab-label" for="tab2-1">Друзья</label>
+            <input id="tab2-1" name="tabs-two" type="radio" checked="checked">
+            <div id="scrollFriend">
+                {% for friend in request.user.friends.all %}
+                    {% if friend.friends %}
+                        <div class="allPeopleBox">
+                            <div class="bi-dot">
+                                {% if friend.friends.is_online %}
+                                    <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-dot" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                      <path fill-rule="evenodd" d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                                    </svg>
+                                {% else %}
+                                    <svg width="5em" height="5em"></svg>
+                                {% endif %}
+                            </div>
+                            <div class="checkPeople">
+                                <input data-user-id="{{ friend.friends.pk }}"  type="checkbox" class="check">
+                            </div>
+                            <a href="{{ friend.friends.get_absolute_url }}">
+                                {% if friend.friends.album.avatar %}
+                                    {% for avatar in friend.friends.album.avatar %}
+                                        <img src="/media/{{ avatar.photo.photo }}" alt="{{ person.first_name }}" class="img-circle">
+                                    {% endfor %}
+                                {% else %}
+                                    <img src="/static/default_avatar.jpg" alt="{{ person.first_name }}" class="img-circle">
+                                {% endif %}
+                                <p>{{ friend.friends.first_name }}</p>
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+          </div>
+          <div class="tab-2">
+            <label class="tab-label" for="tab2-2">Все пользователи</label>
+            <input id="tab2-2" name="tabs-two" type="radio">
+            <div id="scrollPeople">
+                {% for user in users %}
+                    <div class="allPeopleBox" id="user-{{ user.id }}">
+                        <div class="bi-dot">
+                            {% if user.is_online %}
+                                <svg width="5em" height="5em" viewBox="0 0 16 16" class="bi bi-dot" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                                </svg>
+                            {% else %}
+                                <svg width="5em" height="5em"></svg>
+                            {% endif %}
+                        </div>
+                        <div class="checkPeople">
+                            <input data-user-id="{{ user.pk }}" type="checkbox" class="check">
+                        </div>
+                        <a href="{{ user.get_absolute_url }}">
+                            {% if user.album.avatar %}
+                                {% for avatar in user.album.avatar %}
+                                    <img src="/media/{{ avatar.photo.photo }}" alt="{{ person.first_name }}" class="img-circle">
+                                {% endfor %}
+                            {% else %}
+                                <img src="/static/default_avatar.jpg" alt="{{ person.first_name }}" class="img-circle">
+                            {% endif %}
+                            <p>{{ user.first_name }}</p>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+          </div>
+        </div>
+    <div class="list-chats">
+        {% if chats.count == 0 %}
+            <div class="chat-not">Нет ни одного начатого диалога</div>
+        {% endif %}
+        {% if chats %}
+            <p class="chat-label">Ваши чаты</p>
+        {% endif %}
+        {% for chat in chats %}
+            {% if chat.message_set.count != 0 %}
+                {% with last_message=chat.message_set.last %}
+                    <div class="chat-box-list">
+                        <a class="chat-list" href="{{ chat.get_absolute_url }}">
+                            <div class="chat-reply-body">
+                                <ul class="list-inline">
+                                    <li class="drop-left-padding">
+                                        <strong class="chat-members-list">
+                                            {% for member in chat.members.all %}
+                                                {% if member != request.user %}
+                                                    {{ member }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </strong>
+                                    </li>
+                                    <li class="pull-right text-muted"><small>{{ last_message.date_pub|utc }}</small></li>
+                                    {% if user != last_message.author and not last_message.is_read %}
+                                        <div  data-chat-id="{{ chat.slug }}" class="chat-unread">
+                                            <li class="pull-right text-muted"><span id="{{ chat.slug }}" style="background-color: #fd264f" class="badge"></span></li>
+                                            {% for message in chat.message_set.all %}
+                                                {% if message.is_read == False %}
+                                                    <li class="unread" style="display: none">{{ message.is_read }}</li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </ul>
+                            </div>
+
+                            {% if chat.members.all.count < 3 %}
+                                {% for member in chat.members.all %}
+                                    {% if member != request.user %}
+                                        {% if member.album.avatar %}
+                                            {% for avatar in member.album.avatar %}
+                                                {% if avatar.photo.photo %}
+                                                    <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-circle avatar-chat">
+                                                {% else %}
+                                                    <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-chat">
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-chat">
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {% if chat.members.last.album.avatar %}
+                                    {% for avatar in chat.members.last.album.avatar %}
+                                        {% if avatar.photo.photo %}
+                                            <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-circle avatar-chat">
+                                        {% else %}
+                                            <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-chat">
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-chat">
+                                {% endif %}
+                            {% endif %}
+
+                            <div class="chat-list-message">
+                                {% if user != last_message.author and not last_message.is_read %}
+                                    <div class="chat-head">
+                                        {% if last_message.author.album.avatar %}
+                                            {% for avatar in last_message.author.album.avatar %}
+                                                {% if avatar.photo.photo %}
+                                                    <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-circle avatar-rounded-sm">
+                                                {% else %}
+                                                    <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-rounded-sm">
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-rounded-sm">
+                                        {% endif %}
+                                        <p class="chat-list-author-message">{{ last_message.author.first_name }}</p>
+                                    </div>
+                                    <div class="chat-message"><p>{{ last_message.message|safe }}</p></div>
+                                {% else %}
+                                    <div class="chat-head">
+                                        {% if last_message.author.album.avatar %}
+                                            {% for avatar in last_message.author.album.avatar %}
+                                                {% if avatar.photo.photo %}
+                                                    <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-circle avatar-rounded-sm">
+                                                {% else %}
+                                                    <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-rounded-sm">
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <img src="/static/default_avatar.jpg" alt="" class="img-circle avatar-rounded-sm">
+                                        {% endif %}
+                                        <p class="chat-list-author-message">{{ last_message.author.first_name }}</p>
+                                    </div>
+                                    <div class="chat-message"
+                                         style="
+                                        {% if user == last_message.author and not last_message.is_read %}
+                                         color: #FD9292;
+                                        {% endif %}">
+                                        <p>{{ last_message.message|safe }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                {% endwith %}
+            {% endif %}
+            <p class="chat-line"></p>
+        {% endfor %}
+    </div>
+
+<script src="{% static 'chats.js' %}"></script>
+{% endblock %}

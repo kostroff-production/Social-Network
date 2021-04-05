@@ -1,0 +1,47 @@
+<div class="post" data-obj="Post" id="post-{{ news_item.pk }}" data-author-obj="/person/{{ news_item.user.slug }}/" data-author-username="{{ news_item.user.first_name }} {{ news_item.user.last_name }}" data-re-post-pk="{% for obj in news_item.re_posts.all %}{{ obj.pk }}{% endfor %}">
+    <p class="post_date"><i>{{ news_item.date_pub }}</i></p>
+    <p class="post_message">{{ news_item.message|safe }}</p>
+    <div class="bi-base">
+        <div class="btn-bi" data-slug="{{ news_item.slug }}" data-id="{{ news_item.id }}" data-obj="person" data-type="Post" data-action="Like" title="Нравится">
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                {% for user in news_item.votes.all %}
+                    {% if request.user == user.user %}
+                        style="display: none"
+                    {% endif %}
+                {% endfor %}
+            >
+              <path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+            </svg>
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                {% for user in news_item.votes.all %}
+                    {% if request.user == user.user %}
+                        style="display: inline-block"
+                    {% endif %}
+                {% endfor %}
+                 style="display: none"
+            >
+              <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+            </svg>
+            <div class="bi-count" data-count="Like">{{ news_item.votes.likes.count }}</div>
+        </div>
+        <a class="btn-bi" href="{{ news_item.get_absolute_url }}" style="text-decoration: none" target="_blank">
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-chat-left-text" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v11.586l2-2A2 2 0 0 1 4.414 11H14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+              <path fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+            </svg>
+            <div class="bi-count">{{ news_item.comments.all.count }}</div>
+        </a>
+        <div class="btn-bi re-post-post" onclick="Router(event)">
+            <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+              <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+            </svg>
+            <div class="bi-count" data-count="RePosts">
+                {% for obj in news_item.re_posts.all %}
+                    {{ obj.recipients.all.count }}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="news_feed"><a href="/person/{{ news_item.user.slug }}/" target="_blank">источник: {{ news_item.user.first_name }} {{ news_item.user.last_name }}</a></div>
+</div>

@@ -1,0 +1,18 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+
+{% block content %}
+<link href="{% static 'Group.css' %}" rel="stylesheet">
+
+<div class="backgroundDiv" id="backgroundDivSubscribe">Вы подписались</div>
+<div class="backgroundDiv" id="backgroundDivUnsubscribe">Вы отписались</div>
+
+    {% if request.user == person %}
+        {% include 'project/includes/list_group_person.html' %}
+    {% else %}
+        {% include 'project/includes/list_group_user.html' %}
+    {% endif %}
+
+<script src="{% static 'Group.js' %}"></script>
+{% endblock %}

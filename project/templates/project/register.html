@@ -1,0 +1,41 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Регистрация</title>
+  </head>
+  <body>
+  	{% block content %}
+    <link href="{% static 'register_user.css' %}" rel="stylesheet">
+
+        <div id="Register">
+            <div class="form">
+                <label class="form_label">Регистрация</label>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        {{ field }}
+                    {% endfor %}
+                    <button id="register_btn" class="form_button" style="display: none">Зарегестрировать</button>
+                </form>
+                <button id="next_btn" class="form_button_next" type="submit" onclick="next()">Далее</button>
+                <button id="two_next_btn" class="form_button_next" type="submit" onclick="twoNext()" style="display: none">Далее</button>
+            </div>
+
+            {% for field in form %}
+                {% if field.errors %}
+                    <div class="alert alert-danger">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <small id="hint_base" style="display: none"><i>* Все поля кроме "Отчества" являются обязательными</i></small>
+            <small id="hint" style="display: none"><i>* Выберете дату своего рождения и пол</i></small>
+        </div>
+
+    <script src="{% static 'register_user.js' %}"></script>
+    {% endblock %}
+  </body>
+</html>

@@ -1,0 +1,18 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+{% block title %}
+    Friends
+{% endblock %}
+
+{% block content %}
+<link href="{% static 'friends.css' %}" rel="stylesheet">
+
+    {% if request.user == person %}
+        {% include 'project/includes/personal_friends.html' %}
+    {% else %}
+        {% include 'project/includes/user_friends.html' %}
+    {% endif %}
+
+<script src="{% static 'friends.js' %}"></script>
+{% endblock %}

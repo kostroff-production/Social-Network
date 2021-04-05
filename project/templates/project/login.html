@@ -1,0 +1,36 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Вход</title>
+  </head>
+  <body>
+  	{% block content %}
+    <link href="{% static 'login_user.css' %}" rel="stylesheet">
+
+	    <div id="Logon">
+            <div class="form">
+                <label class="form_label">Вход</label>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        {{ field }}
+                    {% endfor %}
+                    <button id="logon_btn" class="form_button">Войти</button>
+                </form>
+            </div>
+
+            {% if error_message %}
+                <div id="error_login" class="alert alert-danger">
+                    {{ error_message }}
+                </div>
+            {% endif %}
+            <small id="logon_hint" style="display: none"><i>* Используйте email или номер мобильного телефона в качестве логина</i></small>
+        </div>
+
+    <script src="{% static 'login_user.js' %}"></script>
+    {% endblock %}
+  </body>
+</html>

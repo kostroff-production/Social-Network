@@ -1,0 +1,20 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+{% block title %}
+    {{ person.first_name }} {{ person.last_name }}
+{% endblock %}
+
+{% block content %}
+<link href="{% static 'Post.css' %}" rel="stylesheet">
+<link href="{% static 'personal_account.css' %}" rel="stylesheet">
+
+    {% if request.user == person %}
+        {% include 'project/includes/personal_account.html' %}
+    {% else %}
+        {% include 'project/includes/user_account.html' %}
+    {% endif %}
+
+<script src="{% static 'Post.js' %}"></script>
+<script src="{% static 'personal_account.js' %}"></script>
+{% endblock %}

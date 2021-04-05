@@ -1,0 +1,17 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+{% block content %}
+<link href="{% static 'Post.css' %}" rel="stylesheet">
+<link href="{% static 'Audio.css' %}" rel="stylesheet">
+
+<div id="successAddAudio" class="backgroundDivAdd">Трек добавлен в медиатеку</div>
+
+    {% if request.user == person.user %}
+        {% include 'project/includes/personal_audio_group.html' %}
+    {% else %}
+        {% include 'project/includes/user_audio_group.html' %}
+    {% endif %}
+
+<script src="{% static 'Audio.js' %}"></script>
+{% endblock %}

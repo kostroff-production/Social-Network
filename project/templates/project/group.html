@@ -1,0 +1,495 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+
+{% block content %}
+<link href="{% static 'Group.css' %}" rel="stylesheet">
+<link href="{% static 'Post.css' %}" rel="stylesheet">
+
+<div id="backgroundDivRePost" style="display: none">
+</div>
+<div class="Re-Post person-page" style="display: none">
+    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-x-square-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm9.854 4.854a.5.5 0 0 0-.708-.708L8 7.293 4.854 4.146a.5.5 0 1 0-.708.708L7.293 8l-3.147 3.146a.5.5 0 0 0 .708.708L8 8.707l3.146 3.147a.5.5 0 0 0 .708-.708L8.707 8l3.147-3.146z"/>
+    </svg>
+    <div class="Re-Post-Form">
+        <label class="label">Поделиться контентом</label>
+        <div class="Re-Post-Wall">
+            <label class="checkbox">
+                <input class="checkbox-re-post" type="checkbox" value="1">
+                <div class="checkbox__text">на моей стене</div>
+            </label>
+        </div>
+        <div class="Re-Post-Message">
+            <label class="checkbox">
+                <input class="checkbox-re-post" type="checkbox" value="2">
+                <div class="checkbox__text">в сообщении</div>
+            </label>
+            <div class="Re-Post-Friends">
+                <div class="Search-Friends" style="display: none">
+                    <div class="Search-input" data-object_id="{{ request.user.id }}" contenteditable="true" data-placeholder="Введите ФИО друга...."></div>
+                    <svg onclick="toggleListFriends()" width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-file-arrow-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M12 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                    </svg>
+                </div>
+                <div class="check-user" style="display: none">
+                </div>
+                <div class="Result-Friends" style="display: none">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends %}
+                            <p data-id="user-{{ friend.friends.id }}" onclick="transferID(event)">{{ friend.friends.first_name }} {{ friend.friends.last_name }}</p>
+                        {% endif %}
+                    {% endfor %}
+                    {% for chat in chats %}
+                        <p data-id="chat-{{ chat.id }}" onclick="transferID(event)">{% for members in chat.members.all %}{% if members != request.user %} {{ members }} {% endif %}{% endfor %}</p>
+                    {% endfor %}
+                </div>
+                <div class="Result-Search" style="display: none">
+
+                </div>
+            </div>
+        </div>
+        <div class="Message-box">
+            <div class="Message" id="message-re-post" contenteditable="true" data-placeholder="Ваше сообщение...."></div>
+            <div class="emoji-box-base">
+                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-emoji-smile" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path fill-rule="evenodd" d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683z"/>
+                  <path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+                </svg>
+            </div>
+        </div>
+        <button class="button-re-post" data-slug="{{ request.user.slug }}">Отправить</button>
+    </div>
+</div>
+
+<div class="scrollTop-btn" style="display: none">
+    <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-chevron-double-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708l6-6z"/>
+      <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+    </svg>
+</div>
+
+<div class="group-head scroll">
+    <div class="group-body avatar">
+        {% if group.album.avatar %}
+            {% for avatar in group.album.avatar %}
+                {% if avatar.photo.photo %}
+                    <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-avatar">
+                {% else %}
+                    <img src="/static/defaultGroup.png" alt="" class="img-avatar">
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <img src="/static/defaultGroup.png" alt="" class="img-avatar">
+        {% endif %}
+    </div>
+    <div class="group head">
+        <div class="group-body title">
+            <p class="group-name">{{ group.name }}</p>
+            <p class="group-quote">{{ group.quote }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="group-head">
+    <div class="group-body avatar">
+        {% if group.album.avatar %}
+            {% for avatar in group.album.avatar %}
+                {% if avatar.photo.photo %}
+                    <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-avatar">
+                {% else %}
+                    <img src="/static/defaultGroup.png" alt="" class="img-avatar">
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <img src="/static/defaultGroup.png" alt="" class="img-avatar">
+        {% endif %}
+    </div>
+    <div class="group head">
+        <div class="group-body title">
+            <p class="group-name">{{ group.name }}</p>
+            <p class="group-quote">{{ group.quote }}</p>
+            <p class="group-quote">{{ group.description }}</p>
+        </div>
+    </div>
+    <div class="group-menu">
+        {% if request.user == group.user %}
+            <a href="{{ group.get_settings_url }}">
+                <div class="body-drop">
+                    <div class="text">
+                        <p>Настройки</p>
+                    </div>
+                    <div class="tag">
+                        <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-gear-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 0 0-5.86 2.929 2.929 0 0 0 0 5.858z"/>
+                        </svg>
+                    </div>
+                </div>
+            </a>
+        {% endif %}
+        {% if request.user not in group.followers.all %}
+            <div class="body-drop subscribe" onclick="pushSubscribe(event)">
+                <div class="text txt" data-pk="{{ group.pk }}" onclick="createFollowers(event)">
+                    <p>Подписаться</p>
+                </div>
+                <div class="tag">
+                    <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-check2-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="body-drop unsubscribe" style="display: none" onclick="pushUnsubscribe(event)">
+                <div class="text txt" data-pk="{{ group.pk }}" onclick="removeFollowers(event)">
+                    <p>Отписаться</p>
+                </div>
+                <div class="tag">
+                    <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-backspace" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
+                      <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
+                      <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
+                    </svg>
+                </div>
+            </div>
+        {% elif request.user in group.followers.all %}
+            <div class="body-drop unsubscribe" onclick="pushUnsubscribe(event)">
+                <div class="text txt" data-pk="{{ group.pk }}" onclick="removeFollowers(event)">
+                    <p>Отписаться</p>
+                </div>
+                <div class="tag">
+                    <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-backspace" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M6.603 2h7.08a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-7.08a1 1 0 0 1-.76-.35L1 8l4.844-5.65A1 1 0 0 1 6.603 2zm7.08-1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-7.08a2 2 0 0 1-1.519-.698L.241 8.65a1 1 0 0 1 0-1.302L5.084 1.7A2 2 0 0 1 6.603 1h7.08z"/>
+                      <path fill-rule="evenodd" d="M5.83 5.146a.5.5 0 0 0 0 .708l5 5a.5.5 0 0 0 .707-.708l-5-5a.5.5 0 0 0-.708 0z"/>
+                      <path fill-rule="evenodd" d="M11.537 5.146a.5.5 0 0 1 0 .708l-5 5a.5.5 0 0 1-.708-.708l5-5a.5.5 0 0 1 .707 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="body-drop subscribe" style="display: none" onclick="pushSubscribe(event)">
+                <div class="text txt" data-pk="{{ group.pk }}" onclick="createFollowers(event)">
+                    <p>Подписаться</p>
+                </div>
+                <div class="tag">
+                    <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-check2-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L8 9.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M1.5 13A1.5 1.5 0 0 0 3 14.5h10a1.5 1.5 0 0 0 1.5-1.5V8a.5.5 0 0 0-1 0v5a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5h8a.5.5 0 0 0 0-1H3A1.5 1.5 0 0 0 1.5 3v10z"/>
+                    </svg>
+                </div>
+            </div>
+        {% endif %}
+        <div class="body-drop re_post" data-id="group-{{ group.id }}" onclick="Router(event)">
+            <div class="text">
+                <p>Поделиться</p>
+            </div>
+            <div class="tag">
+                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+                  <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                </svg>
+            </div>
+        </div>
+        <a href="{{ group.get_photos_url }}">
+            <div class="body-drop">
+                <div class="text">
+                    <p>Фото</p>
+                </div>
+                <div class="tag">
+                    <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-camera-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                      <path fill-rule="evenodd" d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+        <a href="{{ group.get_audios_url }}">
+            <div class="body-drop">
+                <div class="text">
+                    <p>Аудио</p>
+                </div>
+                <div class="tag">
+                    <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-music-note-list" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 13c0 1.105-1.12 2-2.5 2S7 14.105 7 13s1.12-2 2.5-2 2.5.895 2.5 2z"/>
+                      <path fill-rule="evenodd" d="M12 3v10h-1V3h1z"/>
+                      <path d="M11 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 16 2.22V4l-5 1V2.82z"/>
+                      <path fill-rule="evenodd" d="M0 11.5a.5.5 0 0 1 .5-.5H4a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 7H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5zm0-4A.5.5 0 0 1 .5 3H8a.5.5 0 0 1 0 1H.5a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+        <a href="{{ group.get_videos_url }}">
+            <div class="body-drop">
+                <div class="text">
+                    <p>Видео</p>
+                </div>
+                <div class="tag">
+                    <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-camera-reels-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2.667 6h6.666C10.253 6 11 6.746 11 7.667v6.666c0 .92-.746 1.667-1.667 1.667H2.667C1.747 16 1 15.254 1 14.333V7.667C1 6.747 1.746 6 2.667 6z"/>
+                      <path d="M7.404 11.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V7.308c0-.63-.693-1.01-1.233-.696l-6.363 3.692a.802.802 0 0 0 0 1.393z"/>
+                      <circle cx="3" cy="3" r="3"/>
+                      <circle cx="9" cy="3" r="3"/>
+                    </svg>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="group-followers">Подписчиков: {{ group.followers.all.count }}</div>
+</div>
+
+<div class="group" id="group-{{ group.pk }}" style="display: none">
+    <div class="group-body avatar">
+        {% if group.album.avatar %}
+            {% for avatar in group.album.avatar %}
+                {% if avatar.photo.photo %}
+                    <a href="{{ group.get_absolute_url }}"><img src="/media/{{ avatar.photo.photo }}" alt="" class="img-avatar"></a>
+                {% else %}
+                    <a href="{{ group.get_absolute_url }}"><img src="/static/defaultGroup.png" alt="" class="img-avatar"></a>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <a href="{{ group.get_absolute_url }}"><img src="/static/defaultGroup.png" alt="" class="img-avatar"></a>
+        {% endif %}
+    </div>
+    <div class="group-body title">
+        <p class="group-name"><a href="{{ group.get_absolute_url }}">{{ group.name }}</a></p>
+        <p class="group-quote">{{ group.quote }}</p>
+        <p class="group-followers">Подписчиков: {{ group.followers.all.count }}</p>
+    </div>
+    <div class="group-body menu">
+    </div>
+    <div class="drop-menu">
+    </div>
+</div>
+
+<div id="Posts" class="Posts-group" style="overflow: visible; max-height: none; float: none;">
+    {% if request.user == group.user %}
+        <div class="form" id="PostInput">
+            <label class="form_label">Что запостим?</label>
+            <div data-slug="{{ group.slug }}" class="form_input" id="form_input_post" contenteditable="true"></div>
+            <div class="list-media-file"></div>
+            <div class="bi-input-base">
+                <div class="btn-bi photo-files">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-camera" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M15 12V6a1 1 0 0 0-1-1h-1.172a3 3 0 0 1-2.12-.879l-.83-.828A1 1 0 0 0 9.173 3H6.828a1 1 0 0 0-.707.293l-.828.828A3 3 0 0 1 3.172 5H2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2z"/>
+                      <path fill-rule="evenodd" d="M8 11a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                      <path d="M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+                    </svg>
+                </div>
+                <div class="btn-bi video-files">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-camera-video" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M2.667 3.5c-.645 0-1.167.522-1.167 1.167v6.666c0 .645.522 1.167 1.167 1.167h6.666c.645 0 1.167-.522 1.167-1.167V4.667c0-.645-.522-1.167-1.167-1.167H2.667zM.5 4.667C.5 3.47 1.47 2.5 2.667 2.5h6.666c1.197 0 2.167.97 2.167 2.167v6.666c0 1.197-.97 2.167-2.167 2.167H2.667A2.167 2.167 0 0 1 .5 11.333V4.667z"/>
+                      <path fill-rule="evenodd" d="M11.25 5.65l2.768-1.605a.318.318 0 0 1 .482.263v7.384c0 .228-.26.393-.482.264l-2.767-1.605-.502.865 2.767 1.605c.859.498 1.984-.095 1.984-1.129V4.308c0-1.033-1.125-1.626-1.984-1.128L10.75 4.785l.502.865z"/>
+                    </svg>
+                </div>
+                <div class="btn-bi audio-files">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-music-note-beamed" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13c0-1.104 1.12-2 2.5-2s2.5.896 2.5 2zm9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2z"/>
+                      <path fill-rule="evenodd" d="M14 11V2h1v9h-1zM6 3v10H5V3h1z"/>
+                      <path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4V2.905z"/>
+                    </svg>
+                </div>
+                <div class="btn-bi emoji-box-base">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-emoji-smile" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                      <path fill-rule="evenodd" d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683z"/>
+                      <path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+                    </svg>
+                </div>
+                <div class="btn-bi btn-form-post">
+                    <button class="form_button" data-obj="Group/">Опубликовать</button>
+                </div>
+            </div>
+            <div class="add-photo">
+                {% for photo in group.photo.all %}
+                    <div class="photo-file" onclick="addMediaFile(event)">
+                        <svg style="display: none" onclick="DeleteFile(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                          <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                        </svg>
+                        <div class="content">
+                            <img src="/media/{{ photo.photo }}">
+                        </div>
+                        <div class="backgroundDiv">
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="add-video">
+                 <div class="search">
+                    <input type="search" id="SearchInputVideo" class="search-input" placeholder="Поиск видео....">
+                    <svg onclick="searchVideoFile()" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+                      <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+                    </svg>
+                </div>
+                <div style="display: none" onclick="CancelSearch()" class="bi-cancel">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                </div>
+                <div class="searchRes video group-search">
+
+                </div>
+                <div class="video-file search-box" style="display: none" onclick="addMediaFile(event)">
+                    <svg style="display: none" onclick="DeleteFile(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                    <video poster="">
+                        <source src="" type="video/mp4">
+                    </video>
+                </div>
+                <div class="list-video">
+                    {% for video in group.video.all %}
+                        <div class="video-file" onclick="addMediaFile(event)">
+                            <svg style="display: none" onclick="DeleteFile(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                              <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                            </svg>
+                            <video {% if video.poster %} poster="/media/{{ video.poster }}" {% else %} poster="/static/defaultPoster.jpg" {% endif %}>
+                                <source src="/media/{{ video.video }}" type="video/mp4">
+                            </video>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+            <div class="add-audio">
+                <div class="search">
+                    <input type="search" id="SearchInputAudio" class="search-input" placeholder="Поиск аудио....">
+                    <svg onclick="searchAudioFile()" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+                      <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+                    </svg>
+                </div>
+                <div style="display: none" onclick="CancelSearch()" class="bi-cancel">
+                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                </div>
+                <div class="searchRes audio group-search">
+
+                </div>
+                <div class="audio-file search-box" style="display: none" onclick="addMediaFile(event)">
+                    <svg style="display: none" onclick="DeleteFile(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                    <p></p>
+                    <audio controls src="" type="audio/mp3"></audio>
+                </div>
+                <div class="list-audio">
+                    {% for audio in group.audio.all %}
+                        <div class="audio-file" onclick="addMediaFile(event)">
+                            <svg style="display: none" onclick="DeleteFile(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                              <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                              <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                            </svg>
+                            <p>{{ audio.author_track }} - {{ audio.title_track }}</p>
+                            <audio controls src="/media/{{ audio.audio }}" type="audio/mp3"></audio>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% for post in group.posts.all %}
+        <div class="post" data-obj="Post" id="post-{{ post.pk }}" data-author-obj="/person/{{ post.user.slug }}/" data-author-username="{{ post.user.first_name }} {{ post.user.last_name }}" data-re-post-pk="{% for obj in post.re_posts.all %}{{ obj.pk }}{% endfor %}">
+            {% if request.user == group.user %}
+                <svg onclick="DeletePost(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                  <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                </svg>
+            {% endif %}
+            <p class="post_date"><i>{{ post.date_pub }}</i></p>
+            <p class="post_message">{{ post.message|safe }}</p>
+            <div class="bi-base">
+                <div class="btn-bi" data-slug="{{ post.slug }}" data-id="{{ post.id }}" data-obj="groups" data-type="Post" data-action="Like" title="Нравится">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                        {% for user in post.votes.all %}
+                            {% if request.user == user.user %}
+                                style="display: none"
+                            {% endif %}
+                        {% endfor %}
+                    >
+                      <path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                    </svg>
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg"
+                        {% for user in post.votes.all %}
+                            {% if request.user == user.user %}
+                                style="display: inline-block"
+                            {% endif %}
+                        {% endfor %}
+                         style="display: none"
+                    >
+                      <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                    </svg>
+                    <div class="bi-count" data-count="Like">{{ post.votes.likes.count }}</div>
+                </div>
+                <a class="btn-bi" href="{{ post.get_absolute_url }}" style="text-decoration: none; color: #666666" target="_blank">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-chat-left-text" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v11.586l2-2A2 2 0 0 1 4.414 11H14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                      <path fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                    <div class="bi-count">{{ post.comments.all.count }}</div>
+                </a>
+                <div class="btn-bi re-post-post" onclick="Router(event)">
+                    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+                      <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                    </svg>
+                    <div class="bi-count" data-count="RePosts">
+                        {% for obj in post.re_posts.all %}
+                            {{ obj.recipients.all.count }}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="post" style="display: none" data-obj="Post" id="post-create" data-re-post-pk="">
+        <svg onclick="DeletePost(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+          <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+        </svg>
+        <p class="post_date"><i></i></p>
+        <p class="post_message"></p>
+        <div class="bi-base">
+            <div class="btn-bi like" onclick="like(event)" data-obj="person" data-type="Post" data-action="Like" title="Нравится">
+                <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                </svg>
+                <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-heart-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="display: none">
+                  <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                </svg>
+                <div class="bi-count" data-count="Like">0</div>
+            </div>
+            <a class="btn-bi comment" href="" style="text-decoration: none; color: #666666;" target="_blank">
+                <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-chat-left-text" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v11.586l2-2A2 2 0 0 1 4.414 11H14a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                  <path fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                </svg>
+                <div class="bi-count">0</div>
+            </a>
+            <div class="btn-bi re-post-post" onclick="Router(event)">
+                <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-share" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M11.724 3.947l-7 3.5-.448-.894 7-3.5.448.894zm-.448 9l-7-3.5.448-.894 7 3.5-.448.894z"/>
+                  <path fill-rule="evenodd" d="M13.5 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm0 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm-11-6.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm0 1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+                </svg>
+                <div class="bi-count" data-count="RePosts">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="block-emoji" class="block-emoji">
+    {% include 'project/includes/emoji.html' %}
+</div>
+
+<script src="{% static 'Group.js' %}"></script>
+<script src="{% static 'Post.js' %}"></script>
+{% endblock %}

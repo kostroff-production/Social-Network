@@ -1,0 +1,779 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+{% block content %}
+<link href="{% static 'settings.css' %}" rel="stylesheet">
+
+<a class="btn-back" href="{{ person.get_absolute_url }}" title="Назад">
+    <svg width="2.5em" height="2.5em" viewBox="0 0 16 16" class="bi bi-arrow-left-square" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M14 1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+      <path fill-rule="evenodd" d="M8.354 11.354a.5.5 0 0 0 0-.708L5.707 8l2.647-2.646a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708 0z"/>
+      <path fill-rule="evenodd" d="M11.5 8a.5.5 0 0 0-.5-.5H6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 .5-.5z"/>
+    </svg>
+</a>
+
+<h3>Аватар</h3>
+<div class="avatar">
+{% if request.user.slug == person.slug %}
+    {% if person.album.avatar %}
+        {% for avatar in person.album.avatar %}
+            {% if avatar.photo.photo %}
+                <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-avatar">
+            {% else %}
+                <img src="/static/default_avatar.jpg" alt="" class="img-avatar">
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <img src="/static/default_avatar.jpg" alt="" class="img-thumbnail">
+    {% endif %}
+{% else %}
+    {% if person.album.avatar %}
+        {% for avatar in person.album.avatar %}
+            {% if avatar.photo.photo %}
+                <img src="/media/{{ avatar.photo.photo }}" alt="" class="img-avatar">
+            {% else %}
+                <img src="/static/defaultGroup.png" alt="" class="img-avatar">
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <img src="/static/defaultGroup.png" alt="" class="img-thumbnail">
+    {% endif %}
+{% endif %}
+</div>
+<div class="form-avatar">
+    {% if request.user.slug == person.slug %}
+        <form action="{% url 'person_avatar_url' person.slug %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ formAvatar }}
+            <button class="btn-settings">Загрузить</button>
+        </form>
+    {% else %}
+        <form action="{% url 'group_avatar_url' person.slug %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ formAvatar }}
+            <button class="btn-settings">Загрузить</button>
+        </form>
+    {% endif %}
+</div>
+
+<h3>Персональные данные</h3>
+<div class="person-data">
+    {% if request.user.slug == person.slug %}
+        <form action="{% url 'person_update_url' person.slug %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ formPerson }}
+            <button class="btn-settings">Обновить</button>
+        </form>
+    {% else %}
+        <form action="{% url 'group_update_url' person.slug %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ formPerson }}
+            <button class="btn-settings">Обновить</button>
+        </form>
+    {% endif %}
+</div>
+
+{% if request.user.slug == person.slug %}
+    <h3>Приватность страницы</h3>
+    <div class="list-settings-permissions">
+
+    {% if permissions.count == 0 %}
+        <div class="permission all">
+            <label>Тип профиля</label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Открытый" onclick="changeSettings(event)" checked>
+                <div class="checkbox__text">Открытый</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Закрытый" onclick="changeSettings(event)">
+                <div class="checkbox__text">Закрытый</div>
+            </label>
+        </div>
+
+        <div class="permission photo">
+            <label>Фото</label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                <div class="checkbox__text">Видно всем</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                <div class="checkbox__text">Скрыть от всех</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                <div class="checkbox__text">Видно только друзьям</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                <div class="checkbox__text">Скрыть от некоторых друзей</div>
+            </label>
+            <div class="hidden-friend-block">
+                <div class="check-user" style="display: none">
+                    <a></a>
+                    <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                </div>
+                <div class="list-check-user"></div>
+                <div class="list-friends">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends != None %}
+                            <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+            </div>
+        </div>
+
+        <div class="permission video">
+            <label>Видео</label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                <div class="checkbox__text">Видно всем</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                <div class="checkbox__text">Скрыть от всех</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                <div class="checkbox__text">Видно только друзьям</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                <div class="checkbox__text">Скрыть от некоторых друзей</div>
+            </label>
+            <div class="hidden-friend-block">
+                <div class="check-user" style="display: none">
+                    <a></a>
+                    <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                </div>
+                <div class="list-check-user"></div>
+                <div class="list-friends">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends != None %}
+                            <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+            </div>
+        </div>
+
+        <div class="permission audios">
+            <label>Аудио</label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                <div class="checkbox__text">Видно всем</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                <div class="checkbox__text">Скрыть от всех</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                <div class="checkbox__text">Видно только друзьям</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                <div class="checkbox__text">Скрыть от некоторых друзей</div>
+            </label>
+            <div class="hidden-friend-block">
+                <div class="check-user" style="display: none">
+                    <a></a>
+                    <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                </div>
+                <div class="list-check-user"></div>
+                <div class="list-friends">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends != None %}
+                            <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+            </div>
+        </div>
+
+        <div class="permission group">
+            <label>Группы</label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                <div class="checkbox__text">Видно всем</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                <div class="checkbox__text">Скрыть от всех</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                <div class="checkbox__text">Видно только друзьям</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                <div class="checkbox__text">Скрыть от некоторых друзей</div>
+            </label>
+            <div class="hidden-friend-block">
+                <div class="check-user" style="display: none">
+                    <a></a>
+                    <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                </div>
+                <div class="list-check-user"></div>
+                <div class="list-friends">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends != None %}
+                            <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+            </div>
+        </div>
+
+        <div class="permission friends">
+            <label>Друзья</label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                <div class="checkbox__text">Видно всем</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                <div class="checkbox__text">Скрыть от всех</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                <div class="checkbox__text">Видно только друзьям</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                <div class="checkbox__text">Скрыть от некоторых друзей</div>
+            </label>
+            <div class="hidden-friend-block">
+                <div class="check-user" style="display: none">
+                    <a></a>
+                    <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                </div>
+                <div class="list-check-user"></div>
+                <div class="list-friends">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends != None %}
+                            <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+            </div>
+        </div>
+
+        <div class="permission post">
+            <label>Посты</label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                <div class="checkbox__text">Видно всем</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                <div class="checkbox__text">Скрыть от всех</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                <div class="checkbox__text">Видно только друзьям</div>
+            </label>
+            <label class="checkbox">
+                <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                <div class="checkbox__text">Скрыть от некоторых друзей</div>
+            </label>
+            <div class="hidden-friend-block">
+                <div class="check-user" style="display: none">
+                    <a></a>
+                    <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                      <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                    </svg>
+                </div>
+                <div class="list-check-user"></div>
+                <div class="list-friends">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends != None %}
+                            <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+            </div>
+        </div>
+    {% else %}
+        {% for permission in permissions %}
+            <div class="permission all">
+                <label>Тип профиля</label>
+                <label class="checkbox">
+                    {% if permission.all.all.count == 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Открытый" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Открытый" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Открытый</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.all.all.count == 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Закрытый" onclick="changeSettings(event)">
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Закрытый" onclick="changeSettings(event)" checked>
+                    {% endif %}
+                    <div class="checkbox__text">Закрытый</div>
+                </label>
+            </div>
+
+            <div class="permission photo">
+                <label>Фото</label>
+                <label class="checkbox">
+                    {% if permission.photo.all.count == 0 and permission.photoHidFriend.all == 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% elif permission.photo.all.count == 0 and permission.photoHidFriend.all != 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно всем</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.photo.all.count != 0 and permission.txtPhoto == 'Скрыть от всех' %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от всех</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.photo.all.count != 0 and permission.txtPhoto == 'Видно только друзьям' %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно только друзьям</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.photoHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от некоторых друзей</div>
+                </label>
+                <div class="hidden-friend-block">
+                    <div class="check-user" style="display: none">
+                        <a></a>
+                        <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                          <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                        </svg>
+                    </div>
+                    <div class="list-check-user">
+                        {% for friend in permission.photoHidFriend.all %}
+                            <div class="check-user" data-id="{{ friend.id }}">
+                                <a>{{ friend.first_name }} {{ friend.last_name }}</a>
+                                <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                                </svg>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="list-friends">
+                        {% for friend in request.user.friends.all %}
+                            {% if friend.friends != None %}
+                                <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                    {% if permission.photoHidFriend.all.count != 0 %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)" style="display: block">Редактировать список друзей</button>
+                    {% else %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="permission video">
+                <label>Видео</label>
+                <label class="checkbox">
+                    {% if permission.video.all.count == 0 and permission.videoHidFriend.all == 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% elif permission.video.all.count == 0 and permission.videoHidFriend.all != 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно всем</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.video.all.count != 0 and permission.txtVideo == 'Скрыть от всех' %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от всех</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.video.all.count != 0 and permission.txtVideo == 'Видно только друзьям' %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно только друзьям</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.videoHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от некоторых друзей</div>
+                </label>
+                <div class="hidden-friend-block">
+                    <div class="check-user" style="display: none">
+                        <a></a>
+                        <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                          <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                        </svg>
+                    </div>
+                    <div class="list-check-user">
+                        {% for friend in permission.videoHidFriend.all %}
+                            <div class="check-user" data-id="{{ friend.id }}">
+                                <a>{{ friend.first_name }} {{ friend.last_name }}</a>
+                                <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                                </svg>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="list-friends">
+                        {% for friend in request.user.friends.all %}
+                            {% if friend.friends != None %}
+                                <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                    {% if permission.videoHidFriend.all.count != 0 %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)" style="display: block">Редактировать список друзей</button>
+                    {% else %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="permission audios">
+                <label>Аудио</label>
+                <label class="checkbox">
+                    {% if permission.audio.all.count == 0 and permission.audioHidFriend.all.count == 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% elif permission.audio.all.count == 0 and permission.audioHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно всем</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.audio.all.count != 0 and permission.txtAudio == 'Скрыть от всех' %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от всех</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.audio.all.count != 0 and permission.txtAudio == 'Видно только друзьям' %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно только друзьям</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.audioHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от некоторых друзей</div>
+                </label>
+                <div class="hidden-friend-block">
+                    <div class="check-user" style="display: none">
+                        <a></a>
+                        <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                          <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                        </svg>
+                    </div>
+                    <div class="list-check-user">
+                        {% for friend in permission.audioHidFriend.all %}
+                            <div class="check-user" data-id="{{ friend.id }}">
+                                <a>{{ friend.first_name }} {{ friend.last_name }}</a>
+                                <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                                </svg>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="list-friends">
+                        {% for friend in request.user.friends.all %}
+                            {% if friend.friends != None %}
+                                <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                    {% if permission.audioHidFriend.all.count != 0 %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)" style="display: block">Редактировать список друзей</button>
+                    {% else %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="permission group">
+                <label>Группы</label>
+                <label class="checkbox">
+                    {% if permission.group.all.count == 0 and permission.groupHidFriend.all.count == 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% elif permission.group.all.count == 0 and permission.groupHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно всем</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.group.all.count != 0 and permission.txtGroup == 'Скрыть от всех' %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от всех</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.group.all.count != 0 and permission.txtGroup == 'Видно только друзьям' %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно только друзьям</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.groupHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от некоторых друзей</div>
+                </label>
+                <div class="hidden-friend-block">
+                    <div class="check-user" style="display: none">
+                        <a></a>
+                        <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                          <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                        </svg>
+                    </div>
+                    <div class="list-check-user">
+                        {% for friend in permission.groupHidFriend.all %}
+                            <div class="check-user" data-id="{{ friend.id }}">
+                                <a>{{ friend.first_name }} {{ friend.last_name }}</a>
+                                <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                                </svg>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="list-friends">
+                        {% for friend in request.user.friends.all %}
+                            {% if friend.friends != None %}
+                                <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                    {% if permission.groupHidFriend.all.count != 0 %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)" style="display: block">Редактировать список друзей</button>
+                    {% else %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="permission friends">
+                <label>Друзья</label>
+                <label class="checkbox">
+                    {% if permission.friend.all.count == 0 and permission.friendHidFriend.all.count == 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% elif permission.friend.all.count == 0 and permission.friendHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно всем</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.friend.all.count != 0 and permission.txtFriends == 'Скрыть от всех' %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от всех</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.friend.all.count != 0 and permission.txtFriends == 'Видно только друзьям' %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно только друзьям</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.friendHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от некоторых друзей</div>
+                </label>
+                <div class="hidden-friend-block">
+                    <div class="check-user" style="display: none">
+                        <a></a>
+                        <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                          <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                        </svg>
+                    </div>
+                    <div class="list-check-user">
+                        {% for friend in permission.friendHidFriend.all %}
+                            <div class="check-user" data-id="{{ friend.id }}">
+                                <a>{{ friend.first_name }} {{ friend.last_name }}</a>
+                                <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                                </svg>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="list-friends">
+                        {% for friend in request.user.friends.all %}
+                            {% if friend.friends != None %}
+                                <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                    {% if permission.friendHidFriend.all.count != 0 %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)" style="display: block">Редактировать список друзей</button>
+                    {% else %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="permission post">
+                <label>Посты</label>
+                <label class="checkbox">
+                    {% if permission.post.all.count == 0 and permission.postHidFriend.all.count == 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% elif permission.post.all.count == 0 and permission.postHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно всем" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно всем</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.post.all.count != 0 and permission.txtPost == 'Скрыть от всех' %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Скрыть от всех" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от всех</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.post.all.count != 0 and permission.txtPost == 'Видно только друзьям' %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission" type="checkbox" value="Видно только друзьям" onclick="changeSettings(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Видно только друзьям</div>
+                </label>
+                <label class="checkbox">
+                    {% if permission.postHidFriend.all.count != 0 %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)" checked>
+                    {% else %}
+                        <input class="checkbox-permission friend" type="checkbox" value="Скрыть от некоторых друзей" onclick="visibleFriend(event)">
+                    {% endif %}
+                    <div class="checkbox__text">Скрыть от некоторых друзей</div>
+                </label>
+                <div class="hidden-friend-block">
+                    <div class="check-user" style="display: none">
+                        <a></a>
+                        <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                          <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                        </svg>
+                    </div>
+                    <div class="list-check-user">
+                        {% for friend in permission.postHidFriend.all %}
+                            <div class="check-user" data-id="{{ friend.id }}">
+                                <a>{{ friend.first_name }} {{ friend.last_name }}</a>
+                                <svg onclick="cancelFriend(event)" width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                  <path fill-rule="evenodd" d="M11.854 4.146a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708-.708l7-7a.5.5 0 0 1 .708 0z"/>
+                                  <path fill-rule="evenodd" d="M4.146 4.146a.5.5 0 0 0 0 .708l7 7a.5.5 0 0 0 .708-.708l-7-7a.5.5 0 0 0-.708 0z"/>
+                                </svg>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="list-friends">
+                        {% for friend in request.user.friends.all %}
+                            {% if friend.friends != None %}
+                                <input type="checkbox" class="hidden-friend-checkbox" value="{{ friend.friends.id }}" data-name="{{ friend.friends.first_name }} {{ friend.friends.last_name }}"><a> {{ friend.friends.first_name }} {{ friend.friends.last_name }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <button class="btn-settings create" onclick="checkboxFriends(event)">Сохранить отмеченных друзей</button>
+                    {% if permission.postHidFriend.all.count != 0 %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)" style="display: block">Редактировать список друзей</button>
+                    {% else %}
+                        <button class="btn-settings update" onclick="checkboxFriendsUpdate(event)">Редактировать список друзей</button>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    </div>
+{% endif %}
+
+<script src="{% static 'Settings.js' %}"></script>
+{% endblock %}

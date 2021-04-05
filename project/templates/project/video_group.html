@@ -1,0 +1,15 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+
+{% block content %}
+<link href="{% static 'Video.css' %}" rel="stylesheet">
+
+    {% if request.user == person.user %}
+        {% include 'project/includes/personal_video.html' %}
+    {% else %}
+        {% include 'project/includes/user_video.html' %}
+    {% endif %}
+
+<script src="{% static 'Video.js' %}"></script>
+{% endblock %}

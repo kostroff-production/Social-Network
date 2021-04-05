@@ -1,0 +1,86 @@
+{% extends 'nav_bar.html' %}
+{% load static %}
+
+
+{% block content %}
+<link href="{% static 'NewsFeed.css' %}" rel="stylesheet">
+
+<div id="backgroundDivRePost" style="display: none">
+</div>
+<div class="Re-Post" style="display: none">
+    <svg width="2em" height="2em" viewBox="0 0 16 16" class="bi bi-x-square-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm9.854 4.854a.5.5 0 0 0-.708-.708L8 7.293 4.854 4.146a.5.5 0 1 0-.708.708L7.293 8l-3.147 3.146a.5.5 0 0 0 .708.708L8 8.707l3.146 3.147a.5.5 0 0 0 .708-.708L8.707 8l3.147-3.146z"/>
+    </svg>
+    <div class="Re-Post-Form">
+        <label class="label">Поделиться контентом</label>
+        <div class="Re-Post-Wall">
+            <label class="checkbox">
+                <input class="checkbox-re-post" type="checkbox" value="1">
+                <div class="checkbox__text">на моей стене</div>
+            </label>
+        </div>
+        <div class="Re-Post-Message">
+            <label class="checkbox">
+                <input class="checkbox-re-post" type="checkbox" value="2">
+                <div class="checkbox__text">в сообщении</div>
+            </label>
+            <div class="Re-Post-Friends">
+                <div class="Search-Friends" style="display: none">
+                    <div class="Search-input" data-object_id="{{ request.user.id }}" contenteditable="true" data-placeholder="Введите ФИО друга...."></div>
+                    <svg onclick="toggleListFriends()" width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-file-arrow-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M12 1H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                    </svg>
+                </div>
+                <div class="check-user" style="display: none">
+                </div>
+                <div class="Result-Friends" style="display: none">
+                    {% for friend in request.user.friends.all %}
+                        {% if friend.friends %}
+                            <p data-id="user-{{ friend.friends.id }}" onclick="transferID(event)">{{ friend.friends.first_name }} {{ friend.friends.last_name }}</p>
+                        {% endif %}
+                    {% endfor %}
+                    {% for chat in chats %}
+                        <p data-id="chat-{{ chat.id }}" onclick="transferID(event)">{% for members in chat.members.all %}{% if members != request.user %} {{ members }} {% endif %}{% endfor %}</p>
+                    {% endfor %}
+                </div>
+                <div class="Result-Search" style="display: none">
+
+                </div>
+            </div>
+        </div>
+        <div class="Message-box">
+            <div class="Message" id="message-re-post" contenteditable="true" data-placeholder="Ваше сообщение...."></div>
+            <div class="emoji-box-base">
+                <svg width="20px" height="20px" viewBox="0 0 16 16" class="bi bi-emoji-smile" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path fill-rule="evenodd" d="M4.285 9.567a.5.5 0 0 1 .683.183A3.498 3.498 0 0 0 8 11.5a3.498 3.498 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.498 4.498 0 0 1 8 12.5a4.498 4.498 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683z"/>
+                  <path d="M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5z"/>
+                </svg>
+            </div>
+        </div>
+        <button class="button-re-post" data-slug="{{ request.user.slug }}">Отправить</button>
+    </div>
+    <div id="block-emoji" class="block-emoji">
+        {% include 'project/includes/emoji.html' %}
+    </div>
+</div>
+
+<div id="successAddAudio" class="backgroundDivAdd">Трек добавлен в медиатеку</div>
+<div id="successAddPhoto" class="backgroundDivAdd">Фото добавлено в галлерею</div>
+<div id="successAddVideo" class="backgroundDivAdd">Видео добавлено в ленту</div>
+
+<div class="scrollTop-btn" style="display: none">
+    <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-chevron-double-up" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708l6-6z"/>
+      <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
+    </svg>
+</div>
+
+<div class="news_list">
+    {% for news_item in news %}
+        {% include news_item.TEMPLATE_PREVIEW %}
+    {% endfor %}
+</div>
+
+<script src="{% static 'NewsFeed.js' %}"></script>
+{% endblock %}
