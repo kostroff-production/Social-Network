@@ -48,7 +48,7 @@ LOGGING = {
             'level': 'INFO',
             'filters': ['require_debug_true'],
             'class': 'logging.FileHandler',
-            'filename': '/webapps/Social-Network-project/project/debug.log',
+            'filename': '/webapps/Social-Network/Social-Network-project/project/debug.log',
             'formatter': 'simple'
         },
         'mail_admins': {
