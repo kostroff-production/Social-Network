@@ -124,8 +124,13 @@ function Router(event) {
         backgroundDivRePost.style.display = 'block';
         if (PostInput) {PostInput.setAttribute('style', 'z-index: -1;');}
         var body = document.body;
-        parent_block_re_post.style.left = (body.offsetWidth - parent_block_re_post.offsetWidth) / 2 + 'px';
-        parent_block_re_post.style.top = parent_block_re_post.offsetHeight / 4 + 'px';
+        if (body.offsetWidth > 420) {
+            parent_block_re_post.style.left = (body.offsetWidth - parent_block_re_post.offsetWidth) / 2 + 'px';
+            parent_block_re_post.style.top = parent_block_re_post.offsetHeight / 2 + 'px';
+        } else {
+            parent_block_re_post.style.left = (body.offsetWidth - parent_block_re_post.offsetWidth) / 2 + 'px';
+            parent_block_re_post.style.top = parent_block_re_post.offsetHeight / 4 + 'px';
+        }
     }
 
     // проверяем, какой объект модели мы хотим зарепостить
