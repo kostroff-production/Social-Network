@@ -77,8 +77,8 @@
 </div>
 
 <div class="news_list">
-    {{ news.count }}
-    {% if news.count != 0 %}
+    {{ news }}
+    {% if news %}
         {% for news_item in news %}
             {% include news_item.TEMPLATE_PREVIEW %}
         {% endfor %}
