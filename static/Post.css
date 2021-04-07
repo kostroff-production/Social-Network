@@ -554,6 +554,7 @@ video {
     #Posts {
         float: none;
         margin: auto;
+        min-height: 450px;
         max-height: none;
         margin-bottom: 20%;
         padding: 0;
