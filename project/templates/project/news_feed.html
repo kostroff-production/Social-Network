@@ -77,9 +77,13 @@
 </div>
 
 <div class="news_list">
-    {% for news_item in news %}
-        {% include news_item.TEMPLATE_PREVIEW %}
-    {% endfor %}
+    {% if news %}
+        {% for news_item in news %}
+            {% include news_item.TEMPLATE_PREVIEW %}
+        {% endfor %}
+    {% else %}
+        <h3 style="color: #666666">Здесь будут показаны Ваши друзья</h3>
+    {% endif %}
 </div>
 
 <script src="{% static 'NewsFeed.js' %}"></script>
