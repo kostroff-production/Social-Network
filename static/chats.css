@@ -336,6 +336,10 @@
         .bi-dot {
             left: 12px;
         }
+    
+    .chat-not {
+        margin-top: 63%;
+    }
 
     .chat-box-list {
         width: 100%;
