@@ -77,13 +77,9 @@
 </div>
 
 <div class="news_list">
-    {% if news %}
-        {% for news_item in news %}
-            {% include news_item.TEMPLATE_PREVIEW %}
-        {% endfor %}
-    {% else %}
-        <h3 style="color: #666666">Ваша новостная лента пуста, подпишитесь на кого нибудь, что бы получать уведомления.</h3>
-    {% endif %
+    {% for news_item in news %}
+        {% include news_item.TEMPLATE_PREVIEW %}
+    {% endfor %}
 </div>
 
 <script src="{% static 'NewsFeed.js' %}"></script>
