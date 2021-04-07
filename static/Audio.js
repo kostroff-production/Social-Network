@@ -147,34 +147,36 @@ function loadAudio () {
 }
 
 // функция загрузки треков после прогрузки плейлиста
-function load_track(index_no){
-	clearInterval(timer); // сбрасываем временной интервал прошлой песни
-	reset_slider(); // сбрасываем бегунок продолжительности песни
+if (All_song) {
+	function load_track(index_no){
+		clearInterval(timer); // сбрасываем временной интервал прошлой песни
+		reset_slider(); // сбрасываем бегунок продолжительности песни
 
-	track.src = All_song[index_no].audio; // прописываем место хранения трека
-	title.innerHTML = All_song[index_no].author_track + ' - ' + All_song[index_no].title_track; // название и автора
-    track.load(); // начинаем загрузку трека
+		track.src = All_song[index_no].audio; // прописываем место хранения трека
+		title.innerHTML = All_song[index_no].author_track + ' - ' + All_song[index_no].title_track; // название и автора
+	    track.load(); // начинаем загрузку трека
 
-	timer = setInterval(range_slider ,1000); // движение бегунка раз в секунду
-	total.innerHTML = All_song.length; // указываем колличество треков на странице
-	present.innerHTML = All_song[index_no].singer; // указываем номер текущей песни
+		timer = setInterval(range_slider ,1000); // движение бегунка раз в секунду
+		total.innerHTML = All_song.length; // указываем колличество треков на странице
+		present.innerHTML = All_song[index_no].singer; // указываем номер текущей песни
 
-	$.ajax({ // подгружаем альбом воспроизводимой песни
-		url: '/serializers/AlbumAudioTrack/',
-		type: 'GET',
-		data: {
-			author_track: All_song[index_no].author_track
-		},
-		success: function (album) {
-			if (album[0]) { // если альбом есть то устанавливаем его
-			    track_image.src = album[0].photo;
-			    GetColor();
-            } else { // если нет то оставляем лефолтный
-			    track_image.src ='/media/user_16131596871613159687/photo/AlbumDefault.jpg';
-			    GetColor(); // активирует функцию определения цвета фона исходя из альбома
-            }
-		}
-	});
+		$.ajax({ // подгружаем альбом воспроизводимой песни
+			url: '/serializers/AlbumAudioTrack/',
+			type: 'GET',
+			data: {
+				author_track: All_song[index_no].author_track
+			},
+			success: function (album) {
+				if (album[0]) { // если альбом есть то устанавливаем его
+				    track_image.src = album[0].photo;
+				    GetColor();
+		    } else { // если нет то оставляем лефолтный
+				    track_image.src ='/media/user_16131596871613159687/photo/AlbumDefault.jpg';
+				    GetColor(); // активирует функцию определения цвета фона исходя из альбома
+		    }
+			}
+		});
+	}
 }
 
 
