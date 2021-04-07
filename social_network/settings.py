@@ -39,29 +39,29 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
-            'filters': ['require_debug_true'],
+            'level': 'WARNING',
+            'filters': ['require_debug_false'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
         'file': {
-            'level': 'INFO',
-            'filters': ['require_debug_true'],
+            'level': 'WARNING',
+            'filters': ['require_debug_false'],
             'class': 'logging.FileHandler',
-            'filename': '/webapps/Social-Network/Social-Network-project/project/debug.log',
+            'filename': '/Users/Jony/Desktop/Social Network/social_network/project/debug.log',
             'formatter': 'simple'
         },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
-            'filters': ['require_debug_true'],
+            'filters': ['require_debug_false'],
             'formatter': 'verbose'
         }
     },
     'loggers': {
         'django': {
             'handlers': ['console', 'file'],
-            'level': 'INFO',
+            'level': 'WARNING',
             'propagate': True,
         },
         'django.request': {
