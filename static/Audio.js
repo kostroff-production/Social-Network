@@ -87,8 +87,8 @@ function searchAudio() {
                     audio.src = All_song[key].audio;
                     listAudio.appendChild(clone); // добавляем на страницу каждый найденный аудио файл
                 }
-	        if (All_song) {
-			load_track(index_no); // передаем номер трека для начала воспроизведения
+		if (All_song) {
+		    load_track(index_no); // передаем номер трека для начала воспроизведения
 		}
              }
         });
@@ -139,7 +139,9 @@ function loadAudio () {
 				audio.src = All_song[key].audio;
 				listAudio.appendChild(clone);
 			}
-			load_track(index_no);
+			if (All_song) {
+			    load_track(index_no); 
+			}
 		}
 	});
 }
@@ -290,11 +292,11 @@ function change_duration(){
 // активация автовоспроизведения следующего трека после окончания текущего
 function autoplay_switch(){
 	if (autoplay === 1){
-       autoplay = 0;
-       auto_play.style.background = "rgba(255,255,255,0.3)";
+		autoplay = 0;
+		auto_play.style.background = "rgba(255,255,255,0.3)";
 	}else{
-       autoplay = 1;
-       auto_play.style.background = "#fd264f"; // меняем фон кнопки после активации
+		autoplay = 1;
+		auto_play.style.background = "#fd264f"; // меняем фон кнопки после активации
 	}
 }
 
