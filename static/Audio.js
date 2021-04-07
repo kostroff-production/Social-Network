@@ -243,7 +243,7 @@ function pausesong(){
 function clickTrack(event) {
 	var parent = event.target.closest('.audio-name');
 	var num_track = parent.getAttribute('data-index_no');
-	index_no = num_track;
+	index_no = parseInt(num_track);
 	load_track(index_no);
 	playsong();
 }
