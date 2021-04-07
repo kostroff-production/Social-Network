@@ -10,11 +10,10 @@
 .chat-not {
     height: 50px;
     padding: 14px 5px;
-    text-align: left;
+    text-align: center;
     margin-top: 22%;
-    border: 1px solid #FFFFFF;
     border-radius: 10px;
-    box-shadow: 0 4px 25px #FFFFFF;
+    box-shadow: 0 15px 25px #666666;
     color: #666666;
 }
 
