@@ -147,6 +147,15 @@ ADMINS = [
     ('kostroff.jenya@yandex.ru', 'kostroff.jenya@yandex.ru')
 ]
 
+EMAIL_SUBJECT_PREFIX = '[Django] '
+EMAIL_HOST = 'root@5.187.7.3'
+EMAIL_HOST_USER = 'kostroff.jenya@yandex.ru'
+EMAIL_HOST_PASSWORD = 'aH5PleGZSP7XW9sw'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+SERVER_EMAIL = 'kostroff.jenya@yandex.ru'
+DEFAULT_FROM_EMAIL = 'kostroff.jenya@yandex.ru'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
