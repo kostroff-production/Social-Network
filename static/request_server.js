@@ -21,6 +21,9 @@ function UnreadMessages() {
                 unread_messages.innerHTML = data.length;
                 unread_messages_media.style.display = 'inline-block';
                 unread_messages_media.innerHTML = data.length;
+            } else {
+                unread_messages.style.display = 'none';
+                unread_messages_media.style.display = 'none';
             }
         }
     });
@@ -37,6 +40,10 @@ function PossibleFriends() {
                 for (var i = 0; i < possible_friends.length; i++) {
                     possible_friends[i].style.display = 'inline-block';
                     possible_friends[i].innerHTML = data.length;
+                }
+            } else {
+                for (var i = 0; i < possible_friends.length; i++) {
+                    possible_friends[i].style.display = 'none';
                 }
             }
         }
