@@ -148,7 +148,7 @@ ADMINS = [
 ]
 
 EMAIL_SUBJECT_PREFIX = '[Django] '
-EMAIL_HOST = '5.187.7.3'
+EMAIL_HOST = 'fornex.com'
 EMAIL_HOST_USER = 'kostroff.jenya@yandex.ru'
 EMAIL_HOST_PASSWORD = 'aH5PleGZSP7XW9sw'
 EMAIL_PORT = 465
