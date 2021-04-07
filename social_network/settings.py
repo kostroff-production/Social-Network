@@ -40,13 +40,13 @@ LOGGING = {
     'handlers': {
         'console': {
             'level': 'WARNING',
-            'filters': ['require_debug_false'],
+            'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
         'file': {
             'level': 'WARNING',
-            'filters': ['require_debug_false'],
+            'filters': ['require_debug_true'],
             'class': 'logging.FileHandler',
             'filename': '/Users/Jony/Desktop/Social Network/social_network/project/debug.log',
             'formatter': 'simple'
@@ -54,7 +54,7 @@ LOGGING = {
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
-            'filters': ['require_debug_false'],
+            'filters': ['require_debug_true'],
             'formatter': 'verbose'
         }
     },
