@@ -113,7 +113,7 @@ document.querySelectorAll('.gallery-item').forEach(function (item) {
             item.classList.toggle('full'); // добавляем суб класс
             var image = item.querySelector('img');
             var body = document.body;
-            image.style.top = (body.offsetHeight - image.offsetHeight) / 8 + 'px';
+            image.style.top = (image.offsetHeight) / 6 + 'px';
             image.style.left = (body.offsetWidth - image.offsetWidth) / 2 + 'px';
         }
     });
