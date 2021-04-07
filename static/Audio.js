@@ -87,8 +87,10 @@ function searchAudio() {
                     audio.src = All_song[key].audio;
                     listAudio.appendChild(clone); // добавляем на страницу каждый найденный аудио файл
                 }
-                load_track(index_no); // передаем номер трека для начала воспроизведения
-            }
+	        if (All_song) {
+			load_track(index_no); // передаем номер трека для начала воспроизведения
+		}
+             }
         });
     }
 }
