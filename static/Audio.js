@@ -144,7 +144,7 @@ function loadAudio () {
 
 // функция загрузки треков после прогрузки плейлиста
 function load_track(index_no){
-	if (All_song) {
+	if (All_song[index_no].audio) {
 		clearInterval(timer); // сбрасываем временной интервал прошлой песни
 		reset_slider(); // сбрасываем бегунок продолжительности песни
 
