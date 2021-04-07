@@ -143,8 +143,8 @@ function loadAudio () {
 }
 
 // функция загрузки треков после прогрузки плейлиста
-if (All_song) {
-	function load_track(index_no){
+function load_track(index_no){
+	if (All_song) {
 		clearInterval(timer); // сбрасываем временной интервал прошлой песни
 		reset_slider(); // сбрасываем бегунок продолжительности песни
 
@@ -174,6 +174,7 @@ if (All_song) {
 		});
 	}
 }
+
 
 
 
