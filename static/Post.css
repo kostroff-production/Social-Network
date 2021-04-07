@@ -305,6 +305,7 @@
 video {
     outline: none;
     cursor: pointer;
+    object-fit: cover;
 }
 
 .audio-file {
