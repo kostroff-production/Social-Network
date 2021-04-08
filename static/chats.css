@@ -371,4 +371,13 @@
         font-size: 1.1em;
         padding: 1.2rem 0;
     }
+    #scrollSearchResult {
+        overflow-x: auto;
+    }
+    #scrollFriend {
+        overflow-x: auto;
+    }
+    #scrollPeople {
+        overflow-x: auto;
+    }
 }
