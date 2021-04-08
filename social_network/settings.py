@@ -76,7 +76,7 @@ LOGGING = {
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = '%4dyz@lhes*^r0%_%#2_oq1wk2xz=lu0wen623p%8qlv*kzq2='
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -147,17 +147,27 @@ ADMINS = [
     ('kostroff.jenya@yandex.ru', 'kostroff.jenya@yandex.ru')
 ]
 
+EMAIL_SUBJECT_PREFIX = '[Django] '
+EMAIL_HOST = 'fornex.com'
+EMAIL_HOST_USER = 'kostroff.jenya@yandex.ru'
+EMAIL_HOST_PASSWORD = 'aH5PleGZSP7XW9sw'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+SERVER_EMAIL = 'kostroff.jenya@yandex.ru'
+DEFAULT_FROM_EMAIL = 'kostroff.jenya@yandex.ru'
+
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = { # прописываем от куда подключать БД
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'NAME': 'Social-Network',
+        'USER': 'Jony',
+        'PASSWORD': 'Jony8889',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
