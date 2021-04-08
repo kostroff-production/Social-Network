@@ -97,7 +97,7 @@ function Router(event) {
     var target = event.target;
 
     var slug_user = btnRepost.getAttribute('data-slug');
-    var slug_page_person = document.location.href.match(/.+\/\/.+\/.+\/(.+?)\//);
+    var slug_page_person = document.location.href.match(/.+\/\/.+\/(.+)\/(.+?)\//);
     var slug_page_photo = document.location.href.match(/.+\/\/.+\/(.+?)\/.+\//);
     var slug_page_album_detail = document.location.href.match(/.+\/\/.+\/.+\/(\d+?)\/(\d+?)\/(\w+\/\w+)\//);
 
@@ -105,7 +105,7 @@ function Router(event) {
     for (e = 0; e < checkbox.length; e++) {
         // проверяем от куда мы ходим сделать репост
         if (slug_page_person) {
-            if (slug_page_person[1] === slug_user) {
+            if (slug_page_person[1] === 'person' && slug_page_person[2] === slug_user) {
                 checkbox[0].setAttribute('disabled', true);
             }
         } else if (slug_page_photo) {
