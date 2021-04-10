@@ -17,7 +17,6 @@ function ScrollDownPage() {
 }
 
 document.addEventListener('click', function (event) { // меняем подцветку инпута при фокусировке
-   event.preventDefault();
    var target = event.target;
    var message_form = document.getElementById('message-form');
    if (target === input_div) {
