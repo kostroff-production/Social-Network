@@ -39,13 +39,13 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'WARNING',
+            'level': 'INFO',
             'filters': ['require_debug_false'],
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
         },
         'file': {
-            'level': 'WARNING',
+            'level': 'INFO',
             'filters': ['require_debug_false'],
             'class': 'logging.FileHandler',
             'filename': '/webapps/Social-Network/Social-Network-project/project/debug.log',
