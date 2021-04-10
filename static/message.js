@@ -28,6 +28,7 @@ document.addEventListener('click', function (event) { // меняем подцв
 
 // функция создания сообщения
 function CreateMessage(event) {
+    event.preventDefault();
     if (input_div.hasAttribute('data-message-slug') === false) { // проверяем наличие атрибута "обновление сообщения"
         var target = event.target;
         var data_id = document.getElementById('innerMessages');
