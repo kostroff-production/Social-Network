@@ -19,7 +19,7 @@
 В разделе аудио реализована смена цветовой гаммы заднего фона в зависимости от обожки альбома.
 <br>
 <br>
-<div><img src="screenshots/аудио1.jpg">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<img src="screenshots/аудио2.jpg"></div>
+![alt text](screenshots/аудио1.jpg) ![alt text](screenshots/аудио2.jpg) 
 <br>
 <br>
 Под каждым объектом с контентом есть стандартный набор кнопок, это оставить голос, либо комментарий или поделиться.<br>
