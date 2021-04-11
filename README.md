@@ -7,7 +7,7 @@
 ![alt text](screenshots/добавление_фото.png)
 <br>
 <br>
-![alt text](screenshots/галлерея.jpg) &nbsp;&nbsp;&nbsp;&nbsp; ![alt text](screenshots/пост.jpg) 
+![alt text](screenshots/галлерея.jpg) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ![alt text](screenshots/пост.jpg) 
 <br>
 <br>
 Любой пользователь может создать диалог с интересующим его человеком. Система проверит была ли ранее беседа с этим пользователем и переведет на диалог.
@@ -19,7 +19,7 @@
 В разделе аудио реализована смена цветовой гаммы заднего фона в зависимости от обожки альбома.
 <br>
 <br>
-![alt text](screenshots/аудио1.jpg) ![alt text](screenshots/аудио2.jpg) 
+![alt text](screenshots/аудио1.jpg) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ![alt text](screenshots/аудио2.jpg) 
 <br>
 <br>
 Под каждым объектом с контентом есть стандартный набор кнопок, это оставить голос, либо комментарий или поделиться.<br>
@@ -30,18 +30,20 @@
 <br>
 <br>
 У каждого пользователя формируется своя новостная лента с контентом, в зависимости от людей на которых он подписан и сообществ в которых он состоит. Любой пользователь может ограничивать доступ к просмотру своего контента в настройках профиля.
-<h3>API</h3>
+### API
 Практически 80% запросов к базе данных происходит без перезагрузки страницы, что ускоряет ответ от сервера и улучшает восприятие сайта.
-В этом мне помог фреймоврк <code> Django Rest Framework</code>.
+В этом мне помог фреймоврк `Django Rest Framework`.
 Для примера продемострирую фрагмент кода, который решает проеблему подгрузки последнего созданного сообщения пользователем:<br>
-<code>
+```python
     def get(self, request):
         chat_id = request.GET.get('chat_id')
         chat = self.modelChat.objects.filter(id=chat_id)
         message = self.modelSerializer(chat, many=True)
         logger.info('GET: ObjectRequestMessageUser, user - {0}'.format(request.user.email))
         return Response(message.data)
-</code>
+```
 <br>
 Полученные данные обрабатываем в шаблоне. Фреймовр сильно помогает в формировании API и ускоряет процесс разработки.<br>
-Установка и документация описана на сайте: <br><code> https://www.django-rest-framework.org/ </code>
+Установка и документация описана на сайте: 
+<br>
+`*https://www.django-rest-framework.org/*`
