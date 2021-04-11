@@ -21,4 +21,4 @@
 Под каждым объектом с контентом есть стандартный набор кнопок, это оставить голос, либо комментарий или поделиться.
 <br>
 <br>
-![alt text](screenshots/like_comment.jpg "Голос")
+<img src="screenshots/like_comment.jpg">
