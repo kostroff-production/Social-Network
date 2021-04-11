@@ -18,5 +18,7 @@
 <div><img src="screenshots/аудио1.jpg">&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<img src="screenshots/аудио2.jpg"></div>
 <br>
 <br>
-Под каждым объектом с контентом есть стандартный набор кнопок, это оставить голос, либо комментарий или поделиться.<br>
+Под каждым объектом с контентом есть стандартный набор кнопок, это оставить голос, либо комментарий или поделиться.
+<br>
+<br>
 ![alt text](screenshots/like_comment.jpg "Голос")
