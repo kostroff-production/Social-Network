@@ -7,7 +7,7 @@
 ![alt text](screenshots/добавление_фото.png)
 <br>
 <br>
-![alt text](screenshots/галлерея.jpg) $nbsp$nbsp$nbsp$nbsp$nbsp ![alt text](screenshots/пост.jpg) 
+![alt text](screenshots/галлерея.jpg)        ![alt text](screenshots/пост.jpg) 
 <br>
 <br>
 Любой пользователь может создать диалог с интересующим его человеком. Система проверит была ли ранее беседа с этим пользователем и переведет на диалог.
