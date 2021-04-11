@@ -32,16 +32,16 @@
 У каждого пользователя формируется своя новостная лента с контентом, в зависимости от людей на которых он подписан и сообществ в которых он состоит. Любой пользователь может ограничивать доступ к просмотру своего контента в настройках профиля.
 <h3>API</h3>
 Практически 80% запросов к базе данных происходит без перезагрузки страницы, что ускоряет ответ от сервера и улучшает восприятие сайта.
-В этом мне помог фреймоврк <kbd> Django Rest Framework </kbd>.
+В этом мне помог фреймоврк <code> Django Rest Framework </code>.
 Для примера продемострирую фрагмент кода, который решает проеблему подгрузки последнего созданного сообщения пользователем:<br>
-<kbd>
-    def get(self, request):
-        chat_id = request.GET.get('chat_id')
-        chat = self.modelChat.objects.filter(id=chat_id)
-        message = self.modelSerializer(chat, many=True)
-        logger.info('GET: ObjectRequestMessageUser, user - {0}'.format(request.user.email))
-        return Response(message.data) 
-</kbd>
+<code>
+    def get(self, request):<br>
+ &nbsp&nbsp&nbsp&nbs chat_id = request.GET.get('chat_id')<br>
+ &nbsp&nbsp&nbsp&nbs chat = self.modelChat.objects.filter(id=chat_id)<br>
+ &nbsp&nbsp&nbsp&nbs message = self.modelSerializer(chat, many=True)<br>
+ &nbsp&nbsp&nbsp&nbs logger.info('GET: ObjectRequestMessageUser, user - {0}'.format(request.user.email))<br>
+ &nbsp&nbsp&nbsp&nbs return Response(message.data) <br>
+</code>
 <br>
 Полученные данные обрабатываем в шаблоне. Фреймовр сильно помогает в формировании API и ускоряет процесс разработки.<br>
-Установка и документация описана на сайте: <br><kbd> https://www.django-rest-framework.org/ </kbd><br>
+Установка и документация описана на сайте: <br><code> https://www.django-rest-framework.org/ </code><br>
