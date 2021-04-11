@@ -6,5 +6,5 @@
 <br>
 Любой пользователь может завязать диалог с интересующим его человеком.
 <br>
-<img src="screenshots/чат.jpg" style="width: 300px; heigth: auto;">
+<img src="screenshots/чат.jpg" style="width: 100px;">
 <br>
