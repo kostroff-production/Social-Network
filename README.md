@@ -6,6 +6,5 @@
 <br>
 Любой пользователь может завязать диалог с интересующим его человеком.
 <br>
-![alt text](screenshots/чат.jpg "Чат")
-<img src="screenshots/чат.jpg">
+<img src="screenshots/чат.jpg" style="width: 300px; heigth: auto;">
 <br>
