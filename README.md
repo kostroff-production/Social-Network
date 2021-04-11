@@ -46,4 +46,4 @@
 Полученные данные обрабатываем в шаблоне. Фреймовр сильно помогает в формировании API и ускоряет процесс разработки.<br>
 Установка и документация описана на сайте:
 
-[https://www.django-rest-framework.org/]:django-rest-framework.org
+[https://www.django-rest-framework.org/](django-rest-framework.org)
