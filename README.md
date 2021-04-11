@@ -35,6 +35,7 @@
 В этом мне помог фреймоврк `Django Rest Framework`.
 Для примера продемострирую фрагмент кода, который решает проеблему подгрузки последнего созданного сообщения пользователем:<br>
 ```
+python
     def get(self, request):
         chat_id = request.GET.get('chat_id')
         chat = self.modelChat.objects.filter(id=chat_id)
