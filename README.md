@@ -7,5 +7,4 @@
 Любой пользователь может завязать диалог с интересующим его человеком.
 <br>
 <div style="width: 100px;"><img src="screenshots/чат.jpg"></div>
-rtertet
 <br>
