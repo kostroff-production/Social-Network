@@ -15,4 +15,4 @@
 В разделе аудио реализована смена цветовой гаммы заднего фона в зависимости от обожки альбома.
 <br>
 <br>
-<div><img src="screenshots/аудио1.jpg">   <img src="screenshots/аудио2.jpg"></div>
+<div><img src="screenshots/аудио1.jpg">                             <img src="screenshots/аудио2.jpg"></div>
