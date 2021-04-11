@@ -70,8 +70,11 @@
 ![alt text](screenshots/гит.jpg) 
 <br>
 На линукс перейдите в папку с проектом и воспользуйтесь командой:
+<br>
 `git init .`
+<br>
 а после загрузите проект на сервер командой:
+<br>
 `git remote add origin git@github.com:Kostrov-Producsion/Social-Network.git`
 <br>
 В настоящий момент проект развернут на хостинге и доступен по адресу:
