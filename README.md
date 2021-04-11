@@ -49,11 +49,16 @@
 [django-rest-framework.org](https://www.django-rest-framework.org/)
 
 ### Emoji
-Какой чат без эмоджи? В любой беседе мы так или иначе их используем.
-В проект были интегрированы эмоджи из репозитория: [emoji-mart](https://github.com/missive/emoji-mart) 
+Какой чат без эмоджи? В любой беседе мы так или иначе их используем.<br>
+В проект были интегрированы эмоджи из репозитория: [emoji-mart](https://github.com/missive/emoji-mart) <br>
 После чего они были адаптированы под мой проект. Если пользователь находится на сайте через браузер ПК или мобильного устройства, 
 он может воспользоваться ими в любом месте, где требуется отправить какое либо сообщение. 
 <br>
 <br>
-
-![alt text](screenshots/эмоджи_пк.png) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ![alt text](screenshots/эмоджи_мб.jpg) 
+Пример в чате с ПК:
+<br>
+![alt text](screenshots/эмоджи_пк.png) 
+<br>
+Пример в комментариях с мобильного устройства:
+<br>
+![alt text](screenshots/эмоджи_мб.jpg) 
