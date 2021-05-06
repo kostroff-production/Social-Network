@@ -100,6 +100,30 @@
 nginx:
     build: ваш адрес
 ```
+Пароли и имя для БД заданы стандартные, вы можете установить свои.
+<br>
+Для этого необходимо изменить значения в строке файла docker-compose.yml -
+```
+db или свое значение:
+  .....
+    environment:
+      - POSTGRES_USER= свое значение
+      - POSTGRES_PASSWORD= свое значение
+      - POSTGRES_DB= свое значение
+```
+И так же исправить параметры в settings.py - 
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'POSTGRES_DB= свое значение',
+        'USER': 'POSTGRES_USER= свое значение',
+        'PASSWORD': 'POSTGRES_PASSWORD= свое значение',
+        'HOST': 'db или свое значение',
+        'PORT': '5432',
+    }
+}
+```
 Далее отправляем команду на постройку проекта - 
 <br>
 ```
