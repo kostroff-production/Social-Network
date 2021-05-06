@@ -18,6 +18,6 @@ WORKDIR /usr/src/app
 
 COPY ./entrypoint.sh .
 
-COPY . .
+COPY . /usr/src/app
 
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
