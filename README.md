@@ -93,24 +93,4 @@
  apt install git
  git clone https://github.com/Kostrov-Producsion/Social-Network.git
 ```
-<br>
-В моем случае папка nginx с файлами установки и настройки находится в директории проекта. 
-<br>
-Вы можете ее перенести куда Вам будет более удобно, но тогда необходимо будет изменить адрес в файле docker-compose.yml в строке -
-<br>
-```
-nginx:
-    build: ваш адрес
-```
-<br>
-Далее отправляем команду на постройку проекта, все зависимости и алгоритм построения слоев описан в файлах docker-compose.yml и Dockerfile,
-<br>
-в директории nginx.
-<br>
-```
-docker-compose up -d --build
-```
-<br>
-В настоящий момент проект развернут на хостинге и доступен по адресу:
 
-[kostrov-production.ru](http://kostrov-production.ru/)
