@@ -85,7 +85,6 @@
  sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
  sudo chmod +x /usr/local/bin/docker-compose
 ```
-<br>
 Следующим этапом будет создание директории под проект и вытягивание его с git.
 <br>
 ```
@@ -93,4 +92,21 @@
  apt install git
  git clone https://github.com/Kostrov-Producsion/Social-Network.git
 ```
+В моем случае папка nginx с файлами установки и настройки находится в директории проекта. 
+<br>
+Вы можете ее перенести куда Вам будет более удобно, но тогда необходимо будет изменить адрес в файле docker-compose.yml в строке -
+<br>
+```
+nginx:
+    build: ваш адрес
+```
+Далее отправляем команду на постройку проекта, все зависимости и алгоритм построения слоев описан в файлах docker-compose.yml и Dockerfile,
+<br>
+в директории nginx.
+<br>
+```
+docker-compose up -d --build
+```
+В настоящий момент проект развернут на хостинге и доступен по адресу:
 
+[kostrov-production.ru](http://kostrov-production.ru/)
