@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  web:
+    build: ./
+    command: gunicorn Superman.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - ./:/usr/src/app/
+      - static_volume/:/usr/src/app/static/
+      - media_volume/:/usr/src/app/media/
+    restart: always
+    expose:
+      - 8000
+    depends_on:
+      - db
+
+  db:
+    image: postgres:11.11-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=admin_db
+
+  nginx:
+    build: /root/django-on-docker/nginx
+    volumes:
+      - static_volume/:/usr/src/app/static/
+      - media_volume/:/usr/src/app/media/
+    restart: always
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
