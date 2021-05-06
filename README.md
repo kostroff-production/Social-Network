@@ -63,21 +63,48 @@
 
 ![alt text](screenshots/эмоджи_мб.jpg) 
 
-### Установка
+### Install Ubuntu Server
 Установить проект возможно на любом VPS или Server хостинге.<br>
 Ссылкы на вытягивание или скачивание проекта из репозитория доступны во вкладке `code`:
 <br>
 ![alt text](screenshots/гит.jpg) 
 <br>
-### Docker
+#### Docker
+Поднимать проект будем через платформу docker, для этого необходимо подключиться к машине 
+и установить ряд пакетов и утилит, в том числе и сам docker.
 <br>
-Поднимать проект будем через платформу docker
+```
+ sudo apt update
+ sudo apt install apt-transport-https ca-certificates curl software-properties-common
+ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+ sudo apt update
+ apt-cache policy docker-ce
+ sudo apt install docker-ce
+ sudo systemctl status docker
+ sudo curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+ sudo chmod +x /usr/local/bin/docker-compose
+```
 <br>
-`git init .`
+Следующим этапом будет создание директории под проект и вытягивание его с git.
+```
+ mkdir django-on-docker && cd django-on-docker
+ apt install git
+ git clone https://github.com/Kostrov-Producsion/Social-Network.git
+```
 <br>
-а после загрузите проект на сервер командой:
+В моем случае папка nginx с файлами установки и настройки находится в директории проекта. 
+Вы можете ее перенести куда Вам будет более удобно, но тогда необходимо будет изменить адрес в файле docker-compose.yml в строке -
+```
+nginx:
+    build: ваш адрес
+```
 <br>
-`git remote add origin git@github.com:Kostrov-Producsion/Social-Network.git`
+Далее отправляем команду на постройку проекта, все зависимости и алгоритм построения слоев описан в файлах docker-compose.yml и Dockerfile,
+в директории nginx.
+```
+docker-compose up -d --build
+```
 <br>
 В настоящий момент проект развернут на хостинге и доступен по адресу:
 
