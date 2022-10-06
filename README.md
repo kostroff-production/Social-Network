@@ -130,7 +130,3 @@ DATABASES = {
 docker-compose up -d --build
 ```
 Все зависимости и алгоритмы построения слоев описаны в файлах docker-compose.yml и Dockerfile.
-<br>
-В настоящий момент проект развернут на хостинге и доступен по адресу:
-
-[kostrov-production.ru](http://kostrov-production.ru/)
