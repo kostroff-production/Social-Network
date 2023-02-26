@@ -3,7 +3,7 @@ version: '3'
 services:
   web:
     build: ./
-    command: gunicorn Superman.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn Social-Network.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./:/usr/src/app/
       - static_volume/:/usr/src/app/static/
